@@ -1,377 +1,584 @@
-from flask import Flask, render_template, jsonify, request
-import json
-import math
-import os
-from datetime import datetime, timezone
+<!DOCTYPE html>
+<html lang="en">
 
-app = Flask(__name__)
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "data")
+    <title>Lunar South Pole Mission Planner</title>
 
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
 
-# ---------------------------------------------------------
-# DATA LOADING
-# ---------------------------------------------------------
+<body>
 
-def load_json(filename):
-    path = os.path.join(DATA_DIR, filename)
+<div id="app">
 
-    try:
-        with open(path, "r", encoding="utf-8") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return []
-    except json.JSONDecodeError:
-        return []
+    <!-- =========================================
+         TOP MISSION BAR
+    ========================================== -->
 
+    <header id="topbar">
 
-def get_craters():
-    return load_json("craters.json")
+        <div class="brand">
 
+            <div class="brand-title">
+                LUNAR MISSION PLANNER
+            </div>
 
-def get_launch_sites():
-    return load_json("launch_sites.json")
+            <div class="brand-subtitle">
+                SOUTH POLE SITE ANALYSIS
+            </div>
 
+        </div>
 
-# ---------------------------------------------------------
-# BASIC MOON / SUN CALCULATIONS
-# ---------------------------------------------------------
+        <div class="mission-status">
 
-def clamp(value, minimum, maximum):
-    return max(minimum, min(maximum, value))
+            <span class="status-light"></span>
 
+            <span>
+                MISSION SYSTEM ONLINE
+            </span>
 
-def calculate_sun_elevation(latitude, longitude, date_string, lunar_hour=12):
-    """
-    Approximate lunar Sun elevation.
+        </div>
 
-    This is a visualization/planning estimate, NOT mission-grade
-    ephemeris data. A future version can replace this with SPICE.
-    """
+    </header>
 
-    try:
-        date = datetime.fromisoformat(date_string.replace("Z", "+00:00"))
-    except ValueError:
-        date = datetime.now(timezone.utc)
 
-    # Convert date to a rough day number.
-    day_of_year = date.timetuple().tm_yday
+    <!-- =========================================
+         MAIN MISSION SCREEN
+    ========================================== -->
 
-    # Approximate solar declination on the Moon.
-    declination = 1.54 * math.sin(
-        math.radians((day_of_year / 365.25) * 360)
-    )
+    <main id="mission-screen">
 
-    # Approximate local lunar hour angle.
-    hour_angle = (lunar_hour - 12) * 15
+        <!-- =====================================
+             LEFT CONTROL PANEL
+        ====================================== -->
 
-    lat_rad = math.radians(latitude)
-    dec_rad = math.radians(declination)
-    hour_rad = math.radians(hour_angle)
+        <aside
+            id="left-panel"
+            class="hud-panel"
+        >
 
-    sin_elevation = (
-        math.sin(lat_rad) * math.sin(dec_rad)
-        + math.cos(lat_rad)
-        * math.cos(dec_rad)
-        * math.cos(hour_rad)
-    )
+            <div class="panel-heading">
+                MISSION
+            </div>
 
-    elevation = math.degrees(math.asin(clamp(sin_elevation, -1, 1)))
+            <div class="control-group">
 
-    return round(elevation, 2)
+                <label for="launch-site-select">
+                    EARTH LAUNCH SITE
+                </label>
 
+                <select id="launch-site-select">
+                    <option value="">
+                        Select launch site
+                    </option>
+                </select>
 
-def calculate_power_potential(sun_elevation):
-    """
-    Convert approximate Sun elevation into a simple solar-power
-    potential score from 0-100.
-    """
+            </div>
 
-    if sun_elevation <= 0:
-        return 0
+            <div class="control-group">
 
-    if sun_elevation >= 15:
-        return 100
+                <label for="crater-select">
+                    LUNAR LANDING SITE
+                </label>
 
-    # At very low elevations, useful sunlight is much harder to obtain.
-    score = (sun_elevation / 15) * 100
+                <select id="crater-select">
+                    <option value="">
+                        Select landing site
+                    </option>
+                </select>
 
-    return round(clamp(score, 0, 100), 1)
+            </div>
 
+            <div class="control-group">
 
-def calculate_earth_visibility(latitude, longitude):
-    """
-    Simplified Earth-visibility estimate.
+                <label for="mission-date">
+                    MISSION DATE
+                </label>
+
+                <input
+                    type="date"
+                    id="mission-date"
+                >
 
-    The lunar south-pole region can have restricted Earth visibility
-    depending on terrain and local horizon conditions.
-    """
+            </div>
 
-    abs_lat = abs(latitude)
+            <div class="control-group">
 
-    if abs_lat >= 85:
-        visibility = 65
-    elif abs_lat >= 80:
-        visibility = 80
-    elif abs_lat >= 70:
-        visibility = 90
-    else:
-        visibility = 100
+                <label for="lunar-hour">
+                    LUNAR LOCAL TIME
+                </label>
 
-    # Longitude is retained for future geometry improvements.
-    _ = longitude
+                <div class="slider-row">
 
-    return visibility
+                    <input
+                        type="range"
+                        id="lunar-hour"
+                        min="0"
+                        max="24"
+                        step="1"
+                        value="12"
+                    >
 
+                    <span id="lunarHourValue">
+                        12:00
+                    </span>
 
-def calculate_communication(earth_visibility):
-    if earth_visibility >= 90:
-        return {
-            "status": "Excellent",
-            "score": earth_visibility
-        }
+                </div>
 
-    if earth_visibility >= 75:
-        return {
-            "status": "Good",
-            "score": earth_visibility
-        }
+            </div>
 
-    if earth_visibility >= 50:
-        return {
-            "status": "Limited",
-            "score": earth_visibility
-        }
+            <button
+                type="button"
+                id="analyze-button"
+                class="primary-button"
+            >
+                ANALYZE SITE
+            </button>
 
-    return {
-        "status": "Poor",
-        "score": earth_visibility
-    }
+            <button
+                type="button"
+                id="reset-camera"
+                class="secondary-button"
+            >
+                RESET CAMERA
+            </button>
 
+            <div class="panel-divider"></div>
 
-# ---------------------------------------------------------
-# ROUTES
-# ---------------------------------------------------------
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+            <!-- VISUALIZATION -->
 
+            <div class="panel-heading">
+                VISUALIZATION
+            </div>
 
-@app.route("/api/craters")
-def api_craters():
-    return jsonify(get_craters())
+            <label class="checkbox-row">
 
+                <input
+                    type="checkbox"
+                    id="crater-filter"
+                    checked
+                >
 
-@app.route("/api/launch-sites")
-def api_launch_sites():
-    return jsonify(get_launch_sites())
+                <span>
+                    Show crater sites
+                </span>
 
+            </label>
 
-@app.route("/api/conditions")
-def api_conditions():
-    """
-    Example:
 
-    /api/conditions?latitude=-89.9&longitude=0&date=2026-10-04&hour=12
-    """
+            <div class="camera-buttons">
 
-    try:
-        latitude = float(request.args.get("latitude", -89.9))
-        longitude = float(request.args.get("longitude", 0))
-        date_string = request.args.get(
-            "date",
-            datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        )
-        lunar_hour = float(request.args.get("hour", 12))
+                <button
+                    type="button"
+                    id="zoom-in"
+                >
+                    +
+                </button>
 
-    except ValueError:
-        return jsonify({
-            "error": "Invalid latitude, longitude, date, or hour."
-        }), 400
+                <button
+                    type="button"
+                    id="zoom-out"
+                >
+                    −
+                </button>
 
-    # Keep coordinates within valid lunar ranges.
-    latitude = clamp(latitude, -90, 90)
-    longitude = ((longitude + 180) % 360) - 180
-    lunar_hour = clamp(lunar_hour, 0, 24)
+                <button
+                    type="button"
+                    id="polar-view"
+                >
+                    POLAR
+                </button>
 
-    sun_elevation = calculate_sun_elevation(
-        latitude,
-        longitude,
-        date_string,
-        lunar_hour
-    )
+                <button
+                    type="button"
+                    id="globe-view"
+                >
+                    GLOBE
+                </button>
 
-    power = calculate_power_potential(sun_elevation)
+            </div>
 
-    earth_visibility = calculate_earth_visibility(
-        latitude,
-        longitude
-    )
+            <div class="panel-divider"></div>
 
-    communication = calculate_communication(
-        earth_visibility
-    )
 
-    return jsonify({
-        "location": {
-            "latitude": latitude,
-            "longitude": longitude
-        },
+            <!-- CAMERA HELP -->
 
-        "date": date_string,
+            <div class="panel-heading">
+                CAMERA
+            </div>
 
-        "lunar_hour": lunar_hour,
+            <div class="camera-help">
 
-        "sun": {
-            "elevation_degrees": sun_elevation,
-            "power_potential_percent": power,
-            "above_horizon": sun_elevation > 0
-        },
+                <div>
+                    <strong>DRAG</strong>
+                    <span>Rotate camera</span>
+                </div>
 
-        "earth": {
-            "visibility_percent": earth_visibility
-        },
+                <div>
+                    <strong>SCROLL</strong>
+                    <span>Zoom</span>
+                </div>
 
-        "communication": communication,
+                <div>
+                    <strong>CLICK</strong>
+                    <span>Select site</span>
+                </div>
 
-        "warning": (
-            "Approximate planning visualization. "
-            "Not suitable for real mission operations."
-        )
-    })
+                <div>
+                    <strong>R</strong>
+                    <span>Reset camera</span>
+                </div>
 
+            </div>
 
-# ---------------------------------------------------------
-# CRATER LOOKUP
-# ---------------------------------------------------------
+        </aside>
 
-@app.route("/api/crater/<name>")
-def api_crater(name):
 
-    craters = get_craters()
+        <!-- =====================================
+             3D VIEWPORT
+        ====================================== -->
 
-    for crater in craters:
-        if crater.get("name", "").lower() == name.lower():
-            return jsonify(crater)
+        <section id="viewport">
 
-    return jsonify({
-        "error": "Crater not found"
-    }), 404
+            <div id="three-container"></div>
 
 
-# ---------------------------------------------------------
-# LAUNCH SITE LOOKUP
-# ---------------------------------------------------------
+            <!-- VIEW HEADER -->
 
-@app.route("/api/launch-site/<name>")
-def api_launch_site(name):
+            <div id="scene-header">
 
-    launch_sites = get_launch_sites()
+                <div>
 
-    for site in launch_sites:
-        if site.get("name", "").lower() == name.lower():
-            return jsonify(site)
+                    <strong>
+                        LUNAR SOUTH POLAR REGION
+                    </strong>
 
-    return jsonify({
-        "error": "Launch site not found"
-    }), 404
+                    <span>
+                        3D MISSION VISUALIZATION
+                    </span>
 
+                </div>
 
-# ---------------------------------------------------------
-# COMPARISON ENDPOINT
-# ---------------------------------------------------------
+            </div>
 
-@app.route("/api/compare")
-def api_compare():
 
-    crater_names = request.args.get("sites", "")
+            <!-- CENTER RETICLE -->
 
-    if not crater_names:
-        return jsonify([])
+            <div id="target-reticle">
 
-    requested_names = [
-        name.strip().lower()
-        for name in crater_names.split(",")
-        if name.strip()
-    ]
+                <div class="reticle-corner top-left"></div>
 
-    craters = get_craters()
-    results = []
+                <div class="reticle-corner top-right"></div>
 
-    date_string = request.args.get(
-        "date",
-        datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    )
+                <div class="reticle-corner bottom-left"></div>
 
-    hour = float(request.args.get("hour", 12))
+                <div class="reticle-corner bottom-right"></div>
 
-    for crater in craters:
+            </div>
 
-        crater_name = crater.get("name", "").lower()
 
-        if crater_name not in requested_names:
-            continue
+            <!-- SPACE OBJECT LABELS -->
 
-        latitude = float(crater.get("lat", 0))
-        longitude = float(crater.get("lon", 0))
+            <div id="scene-labels">
 
-        sun_elevation = calculate_sun_elevation(
-            latitude,
-            longitude,
-            date_string,
-            hour
-        )
+                <div
+                    id="sun-label"
+                    class="space-label"
+                >
+                    SUN
+                </div>
 
-        power = calculate_power_potential(
-            sun_elevation
-        )
+                <div
+                    id="earth-label"
+                    class="space-label"
+                >
+                    EARTH
+                </div>
 
-        earth_visibility = calculate_earth_visibility(
-            latitude,
-            longitude
-        )
+            </div>
 
-        communication = calculate_communication(
-            earth_visibility
-        )
 
-        results.append({
-            **crater,
+            <!-- CAMERA READOUT -->
 
-            "conditions": {
-                "sun_elevation": sun_elevation,
-                "power_potential": power,
-                "earth_visibility": earth_visibility,
-                "communication": communication["status"]
-            }
-        })
+            <div id="camera-readout">
 
-    return jsonify(results)
+                <div>
+                    CAMERA RANGE
+                </div>
 
+                <strong id="cameraDistance">
+                    -- km
+                </strong>
 
-# ---------------------------------------------------------
-# HEALTH CHECK
-# ---------------------------------------------------------
+            </div>
 
-@app.route("/health")
-def health():
-    return jsonify({
-        "status": "online",
-        "service": "Lunar South Pole Mission Planner"
-    })
 
+            <!-- COORDINATE READOUT -->
 
-# ---------------------------------------------------------
-# RUN SERVER
-# ---------------------------------------------------------
+            <div id="coordinate-readout">
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+                <span id="cursorCoords">
+                    LAT -- / LON --
+                </span>
 
-    app.run(
-        host="0.0.0.0",
-        port=port,
-        debug=True
-    )
+            </div>
+
+
+            <!-- LOADING SCREEN -->
+
+            <div id="loading-overlay">
+
+                <div class="loading-box">
+
+                    <div class="loading-title">
+                        INITIALIZING MISSION VIEW
+                    </div>
+
+                    <div class="loading-bar">
+
+                        <div id="loadingProgress"></div>
+
+                    </div>
+
+                    <div id="loadingText">
+                        Loading lunar environment...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             RIGHT TELEMETRY PANEL
+        ====================================== -->
+
+        <aside
+            id="right-panel"
+            class="hud-panel"
+        >
+
+            <div class="panel-heading">
+                MISSION TELEMETRY
+            </div>
+
+
+            <!-- SUN -->
+
+            <div class="telemetry-block">
+
+                <div class="telemetry-label">
+                    SUN ELEVATION
+                </div>
+
+                <div
+                    class="telemetry-value"
+                    id="sunElevation"
+                >
+                    --°
+                </div>
+
+            </div>
+
+
+            <!-- SOLAR POWER -->
+
+            <div class="telemetry-block">
+
+                <div class="telemetry-label">
+                    SOLAR POWER POTENTIAL
+                </div>
+
+                <div
+                    class="telemetry-value"
+                    id="powerPotential"
+                >
+                    --%
+                </div>
+
+                <div class="telemetry-bar">
+
+                    <div id="powerBar"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- EARTH VISIBILITY -->
+
+            <div class="telemetry-block">
+
+                <div class="telemetry-label">
+                    EARTH VISIBILITY
+                </div>
+
+                <div
+                    class="telemetry-value"
+                    id="earthVisibility"
+                >
+                    --%
+                </div>
+
+                <div class="telemetry-bar">
+
+                    <div id="earthBar"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- COMMUNICATION -->
+
+            <div class="telemetry-block">
+
+                <div class="telemetry-label">
+                    DIRECT-TO-EARTH
+                </div>
+
+                <div
+                    class="communication-value"
+                    id="communicationStatus"
+                >
+                    --
+                </div>
+
+            </div>
+
+
+            <div class="panel-divider"></div>
+
+
+            <!-- SELECTED SITE -->
+
+            <div class="panel-heading">
+                SELECTED SITE
+            </div>
+
+            <div class="site-data">
+
+                <div class="data-row">
+
+                    <span>
+                        NAME
+                    </span>
+
+                    <strong id="selected-site-name">
+                        --
+                    </strong>
+
+                </div>
+
+                <div class="data-row">
+
+                    <span>
+                        LATITUDE
+                    </span>
+
+                    <strong id="selected-site-lat">
+                        --
+                    </strong>
+
+                </div>
+
+                <div class="data-row">
+
+                    <span>
+                        LONGITUDE
+                    </span>
+
+                    <strong id="selected-site-lon">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel-divider"></div>
+
+
+            <!-- ANALYSIS -->
+
+            <div class="panel-heading">
+                MISSION ASSESSMENT
+            </div>
+
+            <div
+                id="assessment"
+                class="assessment"
+            >
+                Select a landing site.
+            </div>
+
+            <div
+                id="analysis-warning"
+                class="assessment"
+                style="margin-top: 8px;"
+            >
+            </div>
+
+        </aside>
+
+    </main>
+
+
+    <!-- =========================================
+         BOTTOM COMPARISON PANEL
+    ========================================== -->
+
+    <section id="comparison-panel">
+
+        <div class="comparison-title">
+
+            <div>
+
+                <strong>
+                    LANDING SITE COMPARISON
+                </strong>
+
+                <span>
+                    Candidate sites for current mission conditions
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            id="comparisonGrid"
+            class="comparison-grid"
+        ></div>
+
+    </section>
+
+</div>
+
+
+<!-- =========================================
+     THREE.JS
+     ========================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+
+
+<!-- =========================================
+     APPLICATION
+     ========================================== -->
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+
+</html>
