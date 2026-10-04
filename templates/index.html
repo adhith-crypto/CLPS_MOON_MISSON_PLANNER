@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,15 +13,20 @@
     >
 </head>
 
+
 <body>
 
 <div id="app">
 
-    <!-- TOP MISSION BAR -->
+
+    <!-- =========================================
+         TOP MISSION BAR
+    ========================================== -->
 
     <header id="topbar">
 
         <div class="brand">
+
             <div class="brand-title">
                 LUNAR MISSION PLANNER
             </div>
@@ -28,24 +34,39 @@
             <div class="brand-subtitle">
                 SOUTH POLE SITE ANALYSIS
             </div>
+
         </div>
 
+
         <div class="mission-status">
+
             <span class="status-light"></span>
-            <span>MISSION SYSTEM ONLINE</span>
+
+            <span>
+                MISSION SYSTEM ONLINE
+            </span>
+
         </div>
 
     </header>
 
 
-    <!-- MAIN MISSION SCREEN -->
+
+    <!-- =========================================
+         MAIN MISSION SCREEN
+    ========================================== -->
 
     <main id="mission-screen">
 
 
-        <!-- LEFT: MISSION CONTROLS -->
+        <!-- =====================================
+             LEFT CONTROL PANEL
+        ====================================== -->
 
-        <aside id="left-panel" class="hud-panel">
+        <aside
+            id="left-panel"
+            class="hud-panel"
+        >
 
             <div class="panel-heading">
                 MISSION
@@ -94,6 +115,7 @@
                     LUNAR LOCAL TIME
                 </label>
 
+
                 <div class="slider-row">
 
                     <input
@@ -134,6 +156,8 @@
 
             <div class="panel-divider"></div>
 
+
+            <!-- VISUALIZATION -->
 
             <div class="panel-heading">
                 VISUALIZATION
@@ -178,6 +202,7 @@
                     +
                 </button>
 
+
                 <button
                     type="button"
                     id="zoomOut"
@@ -185,12 +210,14 @@
                     −
                 </button>
 
+
                 <button
                     type="button"
                     id="viewTop"
                 >
                     POLAR
                 </button>
+
 
                 <button
                     type="button"
@@ -205,25 +232,30 @@
             <div class="panel-divider"></div>
 
 
+            <!-- CAMERA HELP -->
+
             <div class="panel-heading">
                 CAMERA
             </div>
+
 
             <div class="camera-help">
 
                 <div>
                     <strong>DRAG</strong>
-                    Rotate camera
+                    <span>Rotate camera</span>
                 </div>
+
 
                 <div>
                     <strong>SCROLL</strong>
-                    Zoom
+                    <span>Zoom</span>
                 </div>
+
 
                 <div>
                     <strong>CLICK</strong>
-                    Select site
+                    <span>Select site</span>
                 </div>
 
             </div>
@@ -231,18 +263,26 @@
         </aside>
 
 
-        <!-- CENTER: 3D SPACE -->
+
+        <!-- =====================================
+             3D VIEWPORT
+        ====================================== -->
 
         <section id="viewport">
+
+
+            <!-- THREE.JS GOES HERE -->
 
             <div id="three-container"></div>
 
 
-            <!-- KSP-STYLE HUD -->
+
+            <!-- VIEW HEADER -->
 
             <div id="scene-header">
 
                 <div>
+
                     <strong>
                         LUNAR SOUTH POLAR REGION
                     </strong>
@@ -250,20 +290,38 @@
                     <span>
                         3D MISSION VISUALIZATION
                     </span>
+
                 </div>
 
             </div>
 
 
+
+            <!-- CENTER RETICLE -->
+
             <div id="target-reticle">
 
-                <div class="reticle-corner top-left"></div>
-                <div class="reticle-corner top-right"></div>
-                <div class="reticle-corner bottom-left"></div>
-                <div class="reticle-corner bottom-right"></div>
+                <div
+                    class="reticle-corner top-left"
+                ></div>
+
+                <div
+                    class="reticle-corner top-right"
+                ></div>
+
+                <div
+                    class="reticle-corner bottom-left"
+                ></div>
+
+                <div
+                    class="reticle-corner bottom-right"
+                ></div>
 
             </div>
 
+
+
+            <!-- SPACE OBJECT LABELS -->
 
             <div id="scene-labels">
 
@@ -274,6 +332,7 @@
                     ☀ SUN
                 </div>
 
+
                 <div
                     id="earth-label"
                     class="space-label"
@@ -283,6 +342,9 @@
 
             </div>
 
+
+
+            <!-- CAMERA READOUT -->
 
             <div id="camera-readout">
 
@@ -297,6 +359,9 @@
             </div>
 
 
+
+            <!-- COORDINATE READOUT -->
+
             <div id="coordinate-readout">
 
                 <span id="cursorCoords">
@@ -306,6 +371,9 @@
             </div>
 
 
+
+            <!-- LOADING SCREEN -->
+
             <div id="loading-overlay">
 
                 <div class="loading-box">
@@ -314,9 +382,15 @@
                         INITIALIZING MISSION VIEW
                     </div>
 
+
                     <div class="loading-bar">
-                        <div id="loadingProgress"></div>
+
+                        <div
+                            id="loadingProgress"
+                        ></div>
+
                     </div>
+
 
                     <div id="loadingText">
                         Loading lunar environment...
@@ -329,9 +403,15 @@
         </section>
 
 
-        <!-- RIGHT: TELEMETRY -->
 
-        <aside id="right-panel" class="hud-panel">
+        <!-- =====================================
+             RIGHT TELEMETRY PANEL
+        ====================================== -->
+
+        <aside
+            id="right-panel"
+            class="hud-panel"
+        >
 
 
             <div class="panel-heading">
@@ -339,11 +419,15 @@
             </div>
 
 
+
+            <!-- SUN -->
+
             <div class="telemetry-block">
 
                 <div class="telemetry-label">
                     SUN ELEVATION
                 </div>
+
 
                 <div
                     class="telemetry-value"
@@ -355,11 +439,15 @@
             </div>
 
 
+
+            <!-- SOLAR POWER -->
+
             <div class="telemetry-block">
 
                 <div class="telemetry-label">
                     SOLAR POWER POTENTIAL
                 </div>
+
 
                 <div
                     class="telemetry-value"
@@ -368,18 +456,27 @@
                     --%
                 </div>
 
+
                 <div class="telemetry-bar">
-                    <div id="powerBar"></div>
+
+                    <div
+                        id="powerBar"
+                    ></div>
+
                 </div>
 
             </div>
 
+
+
+            <!-- EARTH VISIBILITY -->
 
             <div class="telemetry-block">
 
                 <div class="telemetry-label">
                     EARTH VISIBILITY
                 </div>
+
 
                 <div
                     class="telemetry-value"
@@ -388,18 +485,27 @@
                     --%
                 </div>
 
+
                 <div class="telemetry-bar">
-                    <div id="earthBar"></div>
+
+                    <div
+                        id="earthBar"
+                    ></div>
+
                 </div>
 
             </div>
 
+
+
+            <!-- COMMUNICATION -->
 
             <div class="telemetry-block">
 
                 <div class="telemetry-label">
                     DIRECT-TO-EARTH
                 </div>
+
 
                 <div
                     class="communication-value"
@@ -411,8 +517,12 @@
             </div>
 
 
+
             <div class="panel-divider"></div>
 
+
+
+            <!-- SELECTED SITE -->
 
             <div class="panel-heading">
                 SELECTED SITE
@@ -421,36 +531,81 @@
 
             <div class="site-data">
 
-                <div class="data-row">
-                    <span>NAME</span>
-                    <strong id="siteName">--</strong>
-                </div>
 
                 <div class="data-row">
-                    <span>LATITUDE</span>
-                    <strong id="siteLatitude">--</strong>
+
+                    <span>
+                        NAME
+                    </span>
+
+                    <strong id="siteName">
+                        --
+                    </strong>
+
                 </div>
 
-                <div class="data-row">
-                    <span>LONGITUDE</span>
-                    <strong id="siteLongitude">--</strong>
-                </div>
 
                 <div class="data-row">
-                    <span>DIAMETER</span>
-                    <strong id="siteDiameter">--</strong>
+
+                    <span>
+                        LATITUDE
+                    </span>
+
+                    <strong id="siteLatitude">
+                        --
+                    </strong>
+
                 </div>
 
+
                 <div class="data-row">
-                    <span>REGION</span>
-                    <strong id="siteRegion">--</strong>
+
+                    <span>
+                        LONGITUDE
+                    </span>
+
+                    <strong id="siteLongitude">
+                        --
+                    </strong>
+
                 </div>
+
+
+                <div class="data-row">
+
+                    <span>
+                        DIAMETER
+                    </span>
+
+                    <strong id="siteDiameter">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="data-row">
+
+                    <span>
+                        REGION
+                    </span>
+
+                    <strong id="siteRegion">
+                        --
+                    </strong>
+
+                </div>
+
 
             </div>
 
 
+
             <div class="panel-divider"></div>
 
+
+
+            <!-- ASSESSMENT -->
 
             <div class="panel-heading">
                 MISSION ASSESSMENT
@@ -467,16 +622,22 @@
 
         </aside>
 
+
     </main>
 
 
-    <!-- BOTTOM SITE COMPARISON -->
+
+    <!-- =========================================
+         BOTTOM COMPARISON PANEL
+    ========================================== -->
 
     <section id="comparison-panel">
+
 
         <div class="comparison-title">
 
             <div>
+
                 <strong>
                     LANDING SITE COMPARISON
                 </strong>
@@ -484,6 +645,7 @@
                 <span>
                     Candidate sites for current mission conditions
                 </span>
+
             </div>
 
         </div>
@@ -494,28 +656,33 @@
             class="comparison-grid"
         ></div>
 
+
     </section>
+
 
 </div>
 
 
-<!-- THREE.JS -->
+
+<!-- =========================================
+     THREE.JS
+========================================== -->
 
 <script
-    src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js">
-</script>
+    src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"
+></script>
 
 
-<script
-    src="https://cdn.jsdelivr.net/npm/three@0.180.0/examples/js/controls/OrbitControls.js">
-</script>
 
-
-<!-- OUR APPLICATION -->
+<!-- =========================================
+     APPLICATION
+========================================== -->
 
 <script
-    src="{{ url_for('static', filename='app.js') }}">
-</script>
+    src="{{ url_for('static', filename='app.js') }}"
+></script>
+
 
 </body>
+
 </html>
