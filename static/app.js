@@ -5,11 +5,6 @@
 
 const THREE = window.THREE;
 
-
-/* =========================================================
-   GLOBAL STATE
-========================================================= */
-
 let scene;
 let camera;
 let renderer;
@@ -23,21 +18,16 @@ let atmosphere;
 
 let craterData = [];
 let launchData = [];
-
 let craterMeshes = [];
 
 let selectedCrater = null;
 
 let cameraDistance = 7.5;
-
 let cameraYaw = 0.65;
 let cameraPitch = 0.35;
 
 let isDragging = false;
-let previousMouse = {
-    x: 0,
-    y: 0
-};
+let previousMouse = { x: 0, y: 0 };
 
 let raycaster;
 let mouse;
@@ -105,36 +95,107 @@ const loadingText = $("loadingText");
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-    setDefaultDate();
+    try {
 
-    initializeThree();
-
-    setupControls();
-
-    updateLoading(15, "Initializing 3D environment...");
-
-    await loadMissionData();
-
-    updateLoading(100, "Mission environment ready.");
-
-    setTimeout(() => {
-        if (loadingOverlay) {
-            loadingOverlay.style.opacity = "0";
-
-            setTimeout(() => {
-                loadingOverlay.style.display = "none";
-            }, 500);
+        if (!THREE) {
+            throw new Error(
+                "Three.js failed to load."
+            );
         }
-    }, 400);
 
-    if (landingSiteSelect.options.length > 0) {
-        landingSiteSelect.selectedIndex = 0;
-        selectCraterByName(landingSiteSelect.value);
+        setDefaultDate();
+
+        initializeThree();
+
+        setupControls();
+
+        updateLoading(
+            15,
+            "Initializing 3D environment..."
+        );
+
+        await loadMissionData();
+
+        updateLoading(
+            100,
+            "Mission environment ready."
+        );
+
+        setTimeout(() => {
+
+            if (loadingOverlay) {
+
+                loadingOverlay.style.opacity = "0";
+
+                setTimeout(() => {
+
+                    loadingOverlay.style.display =
+                        "none";
+
+                }, 500);
+            }
+
+        }, 400);
+
+
+        if (
+            landingSiteSelect &&
+            landingSiteSelect.options.length > 0
+        ) {
+
+            landingSiteSelect.selectedIndex = 0;
+
+            selectCraterByName(
+                landingSiteSelect.value
+            );
+        }
+
+
+        animationStarted = true;
+
+        animate();
+
     }
 
-    animationStarted = true;
-    animate();
+    catch (error) {
+
+        console.error(
+            "STARTUP ERROR:",
+            error
+        );
+
+        showLoadingError(
+            error.message
+        );
+    }
+
 });
+
+
+/* =========================================================
+   LOADING ERROR
+========================================================= */
+
+function showLoadingError(message) {
+
+    if (loadingText) {
+
+        loadingText.textContent =
+            `SYSTEM ERROR: ${message}`;
+    }
+
+    if (loadingProgress) {
+
+        loadingProgress.style.width =
+            "100%";
+    }
+
+    if (loadingOverlay) {
+
+        loadingOverlay.style.opacity = "1";
+        loadingOverlay.style.display = "flex";
+    }
+}
 
 
 /* =========================================================
@@ -147,13 +208,21 @@ function setDefaultDate() {
 
     const now = new Date();
 
-    const year = now.getFullYear();
+    const year =
+        now.getFullYear();
 
-    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
 
-    const day = String(now.getDate()).padStart(2, "0");
+    const day =
+        String(
+            now.getDate()
+        ).padStart(2, "0");
 
-    missionDate.value = `${year}-${month}-${day}`;
+    missionDate.value =
+        `${year}-${month}-${day}`;
 }
 
 
@@ -163,71 +232,111 @@ function setDefaultDate() {
 
 function initializeThree() {
 
-    const container = $("three-container");
+    const container =
+        $("three-container");
 
     if (!container) {
-        console.error("3D container not found.");
-        return;
+
+        throw new Error(
+            "3D container not found."
+        );
     }
 
-    scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(0x020304);
+    scene =
+        new THREE.Scene();
+
+    scene.background =
+        new THREE.Color(
+            0x020304
+        );
 
 
     /* CAMERA */
 
-    camera = new THREE.PerspectiveCamera(
-        45,
-        container.clientWidth / container.clientHeight,
-        0.01,
-        1000
-    );
+    camera =
+        new THREE.PerspectiveCamera(
+            45,
+            container.clientWidth /
+                Math.max(
+                    container.clientHeight,
+                    1
+                ),
+            0.01,
+            1000
+        );
 
-    camera.position.set(4.7, 3.2, 5.8);
+
+    camera.position.set(
+        4.7,
+        3.2,
+        5.8
+    );
 
 
     /* RENDERER */
 
-    renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        logarithmicDepthBuffer: true
-    });
+    renderer =
+        new THREE.WebGLRenderer({
+            antialias: true,
+            logarithmicDepthBuffer: true
+        });
+
 
     renderer.setPixelRatio(
-        Math.min(window.devicePixelRatio, 2)
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        )
     );
+
 
     renderer.setSize(
         container.clientWidth,
         container.clientHeight
     );
 
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    renderer.shadowMap.enabled = true;
+    if (
+        "outputColorSpace" in renderer &&
+        THREE.SRGBColorSpace
+    ) {
 
-    container.appendChild(renderer.domElement);
+        renderer.outputColorSpace =
+            THREE.SRGBColorSpace;
+    }
+
+
+    renderer.shadowMap.enabled =
+        true;
+
+
+    container.appendChild(
+        renderer.domElement
+    );
 
 
     /* LIGHTING */
 
-    const ambientLight = new THREE.AmbientLight(
-        0x303030,
-        1.0
+    const ambientLight =
+        new THREE.AmbientLight(
+            0x505050,
+            1.5
+        );
+
+    scene.add(
+        ambientLight
     );
 
-    scene.add(ambientLight);
 
+    const sunlight =
+        new THREE.PointLight(
+            0xffffff,
+            500,
+            0,
+            2
+        );
 
-    /* SUN LIGHT */
-
-    const sunlight = new THREE.PointLight(
-        0xffffff,
-        500,
-        0,
-        2
-    );
 
     sunlight.position.set(
         12,
@@ -235,39 +344,30 @@ function initializeThree() {
         8
     );
 
-    sunlight.castShadow = true;
 
-    scene.add(sunlight);
+    sunlight.castShadow =
+        true;
 
+    scene.add(
+        sunlight
+    );
 
-    /* STARS */
 
     createStars();
 
-
-    /* MOON */
-
     createMoon();
 
-
-    /* EARTH */
-
     createEarth();
-
-
-    /* SUN */
 
     createSun();
 
 
-    /* RAYCASTING */
+    raycaster =
+        new THREE.Raycaster();
 
-    raycaster = new THREE.Raycaster();
+    mouse =
+        new THREE.Vector2();
 
-    mouse = new THREE.Vector2();
-
-
-    /* RESIZE */
 
     window.addEventListener(
         "resize",
@@ -275,27 +375,29 @@ function initializeThree() {
     );
 
 
-    /* MOUSE */
-
     renderer.domElement.addEventListener(
         "pointerdown",
         handlePointerDown
     );
+
 
     renderer.domElement.addEventListener(
         "pointermove",
         handlePointerMove
     );
 
+
     renderer.domElement.addEventListener(
         "pointerup",
         handlePointerUp
     );
 
+
     renderer.domElement.addEventListener(
         "pointerleave",
         handlePointerUp
     );
+
 
     renderer.domElement.addEventListener(
         "wheel",
@@ -303,10 +405,14 @@ function initializeThree() {
         { passive: false }
     );
 
+
     renderer.domElement.addEventListener(
         "click",
         handleSceneClick
     );
+
+
+    updateCamera();
 }
 
 
@@ -316,19 +422,32 @@ function initializeThree() {
 
 function createStars() {
 
-    const geometry = new THREE.BufferGeometry();
+    const geometry =
+        new THREE.BufferGeometry();
 
     const positions = [];
 
-    for (let i = 0; i < 1800; i++) {
 
-        const radius = 70 + Math.random() * 120;
+    for (
+        let i = 0;
+        i < 1800;
+        i++
+    ) {
 
-        const theta = Math.random() * Math.PI * 2;
+        const radius =
+            70 +
+            Math.random() * 120;
 
-        const phi = Math.acos(
-            2 * Math.random() - 1
-        );
+        const theta =
+            Math.random() *
+            Math.PI *
+            2;
+
+        const phi =
+            Math.acos(
+                2 * Math.random() - 1
+            );
+
 
         positions.push(
             radius *
@@ -336,10 +455,12 @@ function createStars() {
             Math.cos(theta)
         );
 
+
         positions.push(
             radius *
             Math.cos(phi)
         );
+
 
         positions.push(
             radius *
@@ -347,6 +468,7 @@ function createStars() {
             Math.sin(theta)
         );
     }
+
 
     geometry.setAttribute(
         "position",
@@ -356,103 +478,154 @@ function createStars() {
         )
     );
 
-    const material = new THREE.PointsMaterial({
-        color: 0xd7ddd7,
-        size: 0.08,
-        sizeAttenuation: true
-    });
 
-    const stars = new THREE.Points(
-        geometry,
-        material
+    const material =
+        new THREE.PointsMaterial({
+            color: 0xd7ddd7,
+            size: 0.08,
+            sizeAttenuation: true
+        });
+
+
+    const stars =
+        new THREE.Points(
+            geometry,
+            material
+        );
+
+
+    scene.add(
+        stars
     );
-
-    scene.add(stars);
 }
 
 
 /* =========================================================
-   PROCEDURAL MOON TEXTURE
+   MOON TEXTURE
 ========================================================= */
 
 function createMoonTexture() {
 
-    const canvas = document.createElement("canvas");
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
 
     canvas.width = 1024;
     canvas.height = 512;
 
-    const ctx = canvas.getContext("2d");
 
-    const image = ctx.createImageData(
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.fillStyle =
+        "#777773";
+
+
+    ctx.fillRect(
+        0,
+        0,
         canvas.width,
         canvas.height
     );
 
-    for (let y = 0; y < canvas.height; y++) {
 
-        for (let x = 0; x < canvas.width; x++) {
+    /* SURFACE NOISE */
 
-            const index =
-                (y * canvas.width + x) * 4;
-
-            let noise =
-                Math.random() * 25;
-
-            const base =
-                112 + noise;
-
-            image.data[index] = base;
-            image.data[index + 1] = base;
-            image.data[index + 2] = base - 3;
-            image.data[index + 3] = 255;
-        }
-    }
-
-    ctx.putImageData(image, 0, 0);
-
-
-    /* LARGE CRATERS */
-
-    for (let i = 0; i < 110; i++) {
+    for (
+        let i = 0;
+        i < 30000;
+        i++
+    ) {
 
         const x =
-            Math.random() * canvas.width;
+            Math.random() *
+            canvas.width;
 
         const y =
-            Math.random() * canvas.height;
+            Math.random() *
+            canvas.height;
+
+        const brightness =
+            75 +
+            Math.random() * 65;
+
+
+        ctx.fillStyle =
+            `rgb(
+                ${brightness},
+                ${brightness},
+                ${brightness - 3}
+            )`;
+
+
+        ctx.fillRect(
+            x,
+            y,
+            1,
+            1
+        );
+    }
+
+
+    /* CRATERS */
+
+    for (
+        let i = 0;
+        i < 140;
+        i++
+    ) {
+
+        const x =
+            Math.random() *
+            canvas.width;
+
+        const y =
+            Math.random() *
+            canvas.height;
 
         const radius =
-            4 + Math.random() * 28;
+            3 +
+            Math.random() * 30;
+
 
         const gradient =
             ctx.createRadialGradient(
                 x,
                 y,
-                radius * 0.2,
+                radius * 0.15,
                 x,
                 y,
                 radius
             );
 
-        gradient.addColorStop(
-            0,
-            "rgba(45,45,43,0.65)"
-        );
 
         gradient.addColorStop(
-            0.7,
-            "rgba(75,75,72,0.45)"
+            0,
+            "rgba(40,40,38,0.7)"
         );
+
+
+        gradient.addColorStop(
+            0.65,
+            "rgba(75,75,72,0.5)"
+        );
+
 
         gradient.addColorStop(
             1,
             "rgba(170,170,165,0)"
         );
 
-        ctx.fillStyle = gradient;
+
+        ctx.fillStyle =
+            gradient;
+
 
         ctx.beginPath();
+
 
         ctx.arc(
             x,
@@ -462,11 +635,14 @@ function createMoonTexture() {
             Math.PI * 2
         );
 
+
         ctx.fill();
     }
 
 
-    return new THREE.CanvasTexture(canvas);
+    return new THREE.CanvasTexture(
+        canvas
+    );
 }
 
 
@@ -483,8 +659,10 @@ function createMoon() {
             64
         );
 
+
     const texture =
         createMoonTexture();
+
 
     const material =
         new THREE.MeshStandardMaterial({
@@ -500,57 +678,46 @@ function createMoon() {
             bumpScale: 0.055
         });
 
+
     moon =
         new THREE.Mesh(
             geometry,
             material
         );
 
-    moon.rotation.y = -0.35;
 
-    moon.castShadow = true;
-
-    moon.receiveShadow = true;
-
-    scene.add(moon);
+    moon.rotation.y =
+        -0.35;
 
 
-    /* SOUTH POLE AXIS */
+    moon.castShadow =
+        true;
 
-    const poleGeometry =
-        new THREE.BufferGeometry();
 
-    poleGeometry.setFromPoints([
-        new THREE.Vector3(
-            0,
-            -2.75,
-            0
-        ),
-        new THREE.Vector3(
-            0,
-            -2.2,
-            0
-        )
-    ]);
+    moon.receiveShadow =
+        true;
 
-    const poleMaterial =
-        new THREE.LineBasicMaterial({
-            color: 0xa7bd8c
-        });
 
-    const pole =
-        new THREE.Line(
-            poleGeometry,
-            poleMaterial
-        );
+    scene.add(
+        moon
+    );
 
-    scene.add(pole);
 
+    /* CRATER GROUP */
 
     craterGroup =
         new THREE.Group();
 
-    scene.add(craterGroup);
+
+    /*
+     * IMPORTANT:
+     * Markers belong to the Moon,
+     * so they rotate with it.
+     */
+
+    moon.add(
+        craterGroup
+    );
 }
 
 
@@ -567,11 +734,16 @@ function createEarth() {
             48
         );
 
+
     const canvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
+
 
     canvas.width = 512;
     canvas.height = 256;
+
 
     const ctx =
         canvas.getContext("2d");
@@ -579,7 +751,9 @@ function createEarth() {
 
     /* OCEAN */
 
-    ctx.fillStyle = "#183e5d";
+    ctx.fillStyle =
+        "#163e63";
+
 
     ctx.fillRect(
         0,
@@ -591,26 +765,37 @@ function createEarth() {
 
     /* LAND */
 
-    for (let i = 0; i < 35; i++) {
+    for (
+        let i = 0;
+        i < 45;
+        i++
+    ) {
 
         ctx.fillStyle =
             i % 2 === 0
-                ? "#4c6948"
-                : "#637950";
+                ? "#4e7049"
+                : "#657d52";
+
 
         const x =
-            Math.random() * canvas.width;
+            Math.random() *
+            canvas.width;
 
         const y =
-            Math.random() * canvas.height;
+            Math.random() *
+            canvas.height;
 
         const w =
-            15 + Math.random() * 80;
+            15 +
+            Math.random() * 80;
 
         const h =
-            8 + Math.random() * 35;
+            8 +
+            Math.random() * 35;
+
 
         ctx.beginPath();
+
 
         ctx.ellipse(
             x,
@@ -622,41 +807,57 @@ function createEarth() {
             Math.PI * 2
         );
 
+
         ctx.fill();
     }
 
 
     /* CLOUDS */
 
-    for (let i = 0; i < 40; i++) {
+    for (
+        let i = 0;
+        i < 55;
+        i++
+    ) {
 
         ctx.fillStyle =
-            "rgba(235,240,235,0.28)";
+            "rgba(240,245,245,0.3)";
+
 
         const x =
-            Math.random() * canvas.width;
+            Math.random() *
+            canvas.width;
 
         const y =
-            Math.random() * canvas.height;
+            Math.random() *
+            canvas.height;
+
 
         ctx.beginPath();
+
 
         ctx.ellipse(
             x,
             y,
-            10 + Math.random() * 35,
-            2 + Math.random() * 6,
+            10 +
+                Math.random() * 35,
+            2 +
+                Math.random() * 6,
             0,
             0,
             Math.PI * 2
         );
+
 
         ctx.fill();
     }
 
 
     const texture =
-        new THREE.CanvasTexture(canvas);
+        new THREE.CanvasTexture(
+            canvas
+        );
+
 
     const material =
         new THREE.MeshStandardMaterial({
@@ -665,11 +866,13 @@ function createEarth() {
             metalness: 0
         });
 
+
     earth =
         new THREE.Mesh(
             geometry,
             material
         );
+
 
     earth.position.set(
         -5.5,
@@ -677,10 +880,13 @@ function createEarth() {
         -2.5
     );
 
-    scene.add(earth);
+
+    scene.add(
+        earth
+    );
 
 
-    /* EARTH ATMOSPHERE */
+    /* ATMOSPHERE */
 
     const atmosphereGeometry =
         new THREE.SphereGeometry(
@@ -688,6 +894,7 @@ function createEarth() {
             48,
             32
         );
+
 
     const atmosphereMaterial =
         new THREE.MeshBasicMaterial({
@@ -697,13 +904,17 @@ function createEarth() {
             side: THREE.BackSide
         });
 
+
     atmosphere =
         new THREE.Mesh(
             atmosphereGeometry,
             atmosphereMaterial
         );
 
-    earth.add(atmosphere);
+
+    earth.add(
+        atmosphere
+    );
 }
 
 
@@ -720,10 +931,12 @@ function createSun() {
             32
         );
 
+
     const material =
         new THREE.MeshBasicMaterial({
             color: 0xffd76a
         });
+
 
     sun =
         new THREE.Mesh(
@@ -731,16 +944,20 @@ function createSun() {
             material
         );
 
+
     sun.position.set(
         12,
         5,
         8
     );
 
-    scene.add(sun);
+
+    scene.add(
+        sun
+    );
 
 
-    /* SUN GLOW */
+    /* GLOW */
 
     const glowGeometry =
         new THREE.SphereGeometry(
@@ -748,6 +965,7 @@ function createSun() {
             32,
             32
         );
+
 
     const glowMaterial =
         new THREE.MeshBasicMaterial({
@@ -757,18 +975,22 @@ function createSun() {
             side: THREE.BackSide
         });
 
+
     const glow =
         new THREE.Mesh(
             glowGeometry,
             glowMaterial
         );
 
-    sun.add(glow);
+
+    sun.add(
+        glow
+    );
 }
 
 
 /* =========================================================
-   CRATER MARKERS
+   LAT/LON → 3D
 ========================================================= */
 
 function latitudeLongitudeToVector(
@@ -778,24 +1000,32 @@ function latitudeLongitudeToVector(
 ) {
 
     const lat =
-        THREE.MathUtils.degToRad(latitude);
+        THREE.MathUtils.degToRad(
+            latitude
+        );
 
     const lon =
-        THREE.MathUtils.degToRad(longitude);
+        THREE.MathUtils.degToRad(
+            longitude
+        );
+
 
     const x =
         radius *
         Math.cos(lat) *
         Math.cos(lon);
 
+
     const y =
         radius *
         Math.sin(lat);
+
 
     const z =
         radius *
         Math.cos(lat) *
         Math.sin(lon);
+
 
     return new THREE.Vector3(
         x,
@@ -805,146 +1035,188 @@ function latitudeLongitudeToVector(
 }
 
 
+/* =========================================================
+   CRATER MARKERS
+========================================================= */
+
 function createCraterMarkers() {
 
     if (!craterGroup) return;
 
+
     while (
-        craterGroup.children.length > 0
+        craterGroup.children.length
     ) {
+
         craterGroup.remove(
             craterGroup.children[0]
         );
     }
 
+
     craterMeshes = [];
 
 
-    craterData.forEach((crater) => {
+    craterData.forEach(
+        (crater) => {
 
-        const latitude =
-            Number(
-                crater.lat ??
-                crater.latitude ??
-                0
-            );
-
-        const longitude =
-            Number(
-                crater.lon ??
-                crater.longitude ??
-                0
-            );
-
-
-        const isSouthPole =
-            latitude <= -70;
-
-        const isMajor =
-            !isSouthPole;
-
-
-        const position =
-            latitudeLongitudeToVector(
-                latitude,
-                longitude,
-                2.29
-            );
-
-
-        /* MARKER */
-
-        const markerGeometry =
-            new THREE.SphereGeometry(
-                isSouthPole
-                    ? 0.055
-                    : 0.035,
-                12,
-                8
-            );
-
-        const markerMaterial =
-            new THREE.MeshBasicMaterial({
-                color:
-                    isSouthPole
-                        ? 0xaacb7b
-                        : 0xd6d6d6
-            });
-
-        const marker =
-            new THREE.Mesh(
-                markerGeometry,
-                markerMaterial
-            );
-
-        marker.position.copy(
-            position
-        );
-
-
-        marker.userData.crater =
-            crater;
-
-        marker.userData.isSouthPole =
-            isSouthPole;
-
-        marker.userData.isMajor =
-            isMajor;
-
-
-        craterGroup.add(marker);
-
-        craterMeshes.push(marker);
-
-
-        /* CRATER RING */
-
-        if (isSouthPole) {
-
-            const ringGeometry =
-                new THREE.RingGeometry(
-                    0.075,
-                    0.095,
-                    20
+            const latitude =
+                Number(
+                    crater.lat ??
+                    crater.latitude ??
+                    0
                 );
 
-            const ringMaterial =
+
+            const longitude =
+                Number(
+                    crater.lon ??
+                    crater.longitude ??
+                    0
+                );
+
+
+            const isSouthPole =
+                latitude <= -70;
+
+
+            const isMajor =
+                !isSouthPole;
+
+
+            const position =
+                latitudeLongitudeToVector(
+                    latitude,
+                    longitude,
+                    2.30
+                );
+
+
+            /* MARKER */
+
+            const markerGeometry =
+                new THREE.SphereGeometry(
+                    isSouthPole
+                        ? 0.065
+                        : 0.045,
+                    16,
+                    12
+                );
+
+
+            const markerMaterial =
                 new THREE.MeshBasicMaterial({
-                    color: 0x829a69,
-                    transparent: true,
-                    opacity: 0.65,
-                    side: THREE.DoubleSide
+                    color:
+                        isSouthPole
+                            ? 0xaacb7b
+                            : 0xd6d6d6
                 });
 
-            const ring =
+
+            const marker =
                 new THREE.Mesh(
-                    ringGeometry,
-                    ringMaterial
+                    markerGeometry,
+                    markerMaterial
                 );
 
-            ring.position.copy(
-                position.clone().multiplyScalar(1.005)
+
+            marker.position.copy(
+                position
             );
 
-            ring.lookAt(
-                new THREE.Vector3(0, 0, 0)
-            );
 
-            ring.userData.crater =
+            marker.userData.crater =
                 crater;
 
-            ring.userData.isSouthPole =
-                true;
 
-            ring.userData.isMajor =
-                false;
+            marker.userData.isSouthPole =
+                isSouthPole;
 
-            craterGroup.add(ring);
 
-            craterMeshes.push(ring);
+            marker.userData.isMajor =
+                isMajor;
+
+
+            craterGroup.add(
+                marker
+            );
+
+
+            craterMeshes.push(
+                marker
+            );
+
+
+            /* RING */
+
+            if (isSouthPole) {
+
+                const ringGeometry =
+                    new THREE.RingGeometry(
+                        0.085,
+                        0.11,
+                        24
+                    );
+
+
+                const ringMaterial =
+                    new THREE.MeshBasicMaterial({
+                        color: 0x829a69,
+                        transparent: true,
+                        opacity: 0.7,
+                        side: THREE.DoubleSide
+                    });
+
+
+                const ring =
+                    new THREE.Mesh(
+                        ringGeometry,
+                        ringMaterial
+                    );
+
+
+                ring.position.copy(
+                    position
+                        .clone()
+                        .multiplyScalar(
+                            1.002
+                        )
+                );
+
+
+                ring.lookAt(
+                    new THREE.Vector3(
+                        0,
+                        0,
+                        0
+                    )
+                );
+
+
+                ring.userData.crater =
+                    crater;
+
+
+                ring.userData.isSouthPole =
+                    true;
+
+
+                ring.userData.isMajor =
+                    false;
+
+
+                craterGroup.add(
+                    ring
+                );
+
+
+                craterMeshes.push(
+                    ring
+                );
+            }
+
         }
-
-    });
+    );
 
 
     updateCraterVisibility();
@@ -957,50 +1229,46 @@ function createCraterMarkers() {
 
 function updateCraterVisibility() {
 
-    craterMeshes.forEach((mesh) => {
+    craterMeshes.forEach(
+        (mesh) => {
 
-        const isSouthPole =
-            mesh.userData.isSouthPole;
+            const isSouthPole =
+                mesh.userData.isSouthPole;
 
-        const isMajor =
-            mesh.userData.isMajor;
-
-
-        /*
-         * NORMAL CHECKBOX BEHAVIOR:
-         *
-         * checked = SHOW
-         * unchecked = HIDE
-         */
-
-        const southVisible =
-            southPoleOnly.checked;
-
-        const majorVisible =
-            majorOnly.checked;
+            const isMajor =
+                mesh.userData.isMajor;
 
 
-        let visible = false;
+            let visible = false;
 
 
-        if (
-            isSouthPole &&
-            southVisible
-        ) {
-            visible = true;
+            /*
+             * CHECKED = SHOW
+             * UNCHECKED = HIDE
+             */
+
+            if (
+                isSouthPole &&
+                southPoleOnly.checked
+            ) {
+
+                visible = true;
+            }
+
+
+            if (
+                isMajor &&
+                majorOnly.checked
+            ) {
+
+                visible = true;
+            }
+
+
+            mesh.visible =
+                visible;
         }
-
-
-        if (
-            isMajor &&
-            majorVisible
-        ) {
-            visible = true;
-        }
-
-
-        mesh.visible = visible;
-    });
+    );
 }
 
 
@@ -1008,14 +1276,16 @@ function updateCraterVisibility() {
    SELECT CRATER
 ========================================================= */
 
-function selectCrater(crater) {
+function selectCrater(
+    crater
+) {
 
     if (!crater) return;
 
-    selectedCrater = crater;
 
+    selectedCrater =
+        crater;
 
-    /* DROPDOWN */
 
     if (landingSiteSelect) {
 
@@ -1024,34 +1294,37 @@ function selectCrater(crater) {
     }
 
 
-    /* HIGHLIGHT */
+    craterMeshes.forEach(
+        (mesh) => {
 
-    craterMeshes.forEach((mesh) => {
+            if (
+                mesh.userData.crater &&
+                mesh.userData.crater.name ===
+                    crater.name
+            ) {
 
-        if (
-            mesh.userData.crater &&
-            mesh.userData.crater.name ===
-            crater.name
-        ) {
+                mesh.scale.set(
+                    2.5,
+                    2.5,
+                    2.5
+                );
 
-            mesh.scale.set(
-                2.2,
-                2.2,
-                2.2
-            );
+            } else {
 
-        } else {
-
-            mesh.scale.set(
-                1,
-                1,
-                1
-            );
+                mesh.scale.set(
+                    1,
+                    1,
+                    1
+                );
+            }
         }
-    });
+    );
 
 
-    updateSiteInformation(crater);
+    updateSiteInformation(
+        crater
+    );
+
 
     analyzeSelectedSite();
 
@@ -1059,17 +1332,25 @@ function selectCrater(crater) {
 }
 
 
-function selectCraterByName(name) {
+function selectCraterByName(
+    name
+) {
 
     const crater =
         craterData.find(
-            c =>
-                String(c.name).toLowerCase() ===
-                String(name).toLowerCase()
+            (c) =>
+                String(c.name)
+                    .toLowerCase() ===
+                String(name)
+                    .toLowerCase()
         );
 
+
     if (crater) {
-        selectCrater(crater);
+
+        selectCrater(
+            crater
+        );
     }
 }
 
@@ -1078,24 +1359,30 @@ function selectCraterByName(name) {
    SITE INFORMATION
 ========================================================= */
 
-function updateSiteInformation(crater) {
+function updateSiteInformation(
+    crater
+) {
 
     if (!crater) return;
+
 
     const lat =
         crater.lat ??
         crater.latitude ??
         "--";
 
+
     const lon =
         crater.lon ??
         crater.longitude ??
         "--";
 
+
     const diameter =
         crater.diameter ??
         crater.diameter_km ??
         "--";
+
 
     const region =
         crater.region ??
@@ -1109,39 +1396,65 @@ function updateSiteInformation(crater) {
     siteName.textContent =
         crater.name ?? "--";
 
+
     siteLatitude.textContent =
-        formatCoordinate(lat, "°");
+        formatCoordinate(
+            lat,
+            "°"
+        );
+
 
     siteLongitude.textContent =
-        formatCoordinate(lon, "°");
+        formatCoordinate(
+            lon,
+            "°"
+        );
+
 
     siteDiameter.textContent =
         diameter === "--"
             ? "--"
             : `${diameter} km`;
 
+
     siteRegion.textContent =
         region;
 }
 
 
-function formatCoordinate(value, suffix) {
+function formatCoordinate(
+    value,
+    suffix
+) {
 
-    if (value === "--") return "--";
+    if (
+        value === "--" ||
+        value === null ||
+        value === undefined
+    ) {
+
+        return "--";
+    }
+
 
     const number =
         Number(value);
 
-    if (Number.isNaN(number)) {
+
+    if (
+        Number.isNaN(number)
+    ) {
+
         return String(value);
     }
+
 
     return `${number.toFixed(2)}${suffix}`;
 }
 
 
 /* =========================================================
-   ANALYZE SITE
+   ANALYZE
 ========================================================= */
 
 async function analyzeSelectedSite() {
@@ -1156,6 +1469,7 @@ async function analyzeSelectedSite() {
             0
         );
 
+
     const longitude =
         Number(
             selectedCrater.lon ??
@@ -1169,13 +1483,16 @@ async function analyzeSelectedSite() {
 
 
     const hour =
-        Number(lunarHour.value);
+        Number(
+            lunarHour.value
+        );
 
 
     try {
 
         const url =
-            `/api/conditions?latitude=${encodeURIComponent(latitude)}` +
+            `/api/conditions` +
+            `?latitude=${encodeURIComponent(latitude)}` +
             `&longitude=${encodeURIComponent(longitude)}` +
             `&date=${encodeURIComponent(date)}` +
             `&hour=${encodeURIComponent(hour)}`;
@@ -1186,6 +1503,7 @@ async function analyzeSelectedSite() {
 
 
         if (!response.ok) {
+
             throw new Error(
                 `Server returned ${response.status}`
             );
@@ -1196,9 +1514,14 @@ async function analyzeSelectedSite() {
             await response.json();
 
 
-        updateTelemetry(data);
+        updateTelemetry(
+            data
+        );
 
-        updateAssessment(data);
+
+        updateAssessment(
+            data
+        );
 
     }
 
@@ -1208,6 +1531,7 @@ async function analyzeSelectedSite() {
             "Analysis failed:",
             error
         );
+
 
         assessment.textContent =
             "ANALYSIS ERROR — unable to retrieve mission conditions.";
@@ -1219,16 +1543,20 @@ async function analyzeSelectedSite() {
    TELEMETRY
 ========================================================= */
 
-function updateTelemetry(data) {
+function updateTelemetry(
+    data
+) {
 
     if (!data) return;
 
 
-    const sun =
+    const sunData =
         data.sun || {};
 
-    const earth =
+
+    const earthData =
         data.earth || {};
+
 
     const communication =
         data.communication || {};
@@ -1236,38 +1564,56 @@ function updateTelemetry(data) {
 
     const elevation =
         Number(
-            sun.elevation_degrees ?? 0
+            sunData.elevation_degrees ??
+            0
         );
+
 
     const power =
         Number(
-            sun.power_potential_percent ?? 0
+            sunData.power_potential_percent ??
+            0
         );
+
 
     const visibility =
         Number(
-            earth.visibility_percent ?? 0
+            earthData.visibility_percent ??
+            0
         );
 
 
     sunElevation.textContent =
         `${elevation.toFixed(1)}°`;
 
+
     powerPotential.textContent =
         `${power.toFixed(0)}%`;
+
 
     earthVisibility.textContent =
         `${visibility.toFixed(0)}%`;
 
+
     communicationStatus.textContent =
-        communication.status ?? "--";
+        communication.status ??
+        "--";
 
 
     powerBar.style.width =
-        `${clamp(power, 0, 100)}%`;
+        `${clamp(
+            power,
+            0,
+            100
+        )}%`;
+
 
     earthBar.style.width =
-        `${clamp(visibility, 0, 100)}%`;
+        `${clamp(
+            visibility,
+            0,
+            100
+        )}%`;
 }
 
 
@@ -1275,22 +1621,38 @@ function updateTelemetry(data) {
    ASSESSMENT
 ========================================================= */
 
-function updateAssessment(data) {
+function updateAssessment(
+    data
+) {
 
-    if (!data || !selectedCrater) return;
+    if (
+        !data ||
+        !selectedCrater
+    ) {
+
+        return;
+    }
+
 
     const elevation =
         Number(
-            data.sun?.elevation_degrees ?? 0
+            data.sun
+                ?.elevation_degrees ??
+            0
         );
+
 
     const power =
         Number(
-            data.sun?.power_potential_percent ?? 0
+            data.sun
+                ?.power_potential_percent ??
+            0
         );
 
+
     const communication =
-        data.communication?.status ??
+        data.communication
+            ?.status ??
         "Unknown";
 
 
@@ -1302,12 +1664,16 @@ function updateAssessment(data) {
         message +=
             "SUN ABOVE HORIZON. ";
 
-    } else if (elevation > 0) {
+    }
+
+    else if (elevation > 0) {
 
         message +=
             "LOW-SUN ANGLE. ";
 
-    } else {
+    }
+
+    else {
 
         message +=
             "SUN BELOW HORIZON. ";
@@ -1319,12 +1685,16 @@ function updateAssessment(data) {
         message +=
             "Favorable solar-power conditions. ";
 
-    } else if (power >= 30) {
+    }
+
+    else if (power >= 30) {
 
         message +=
             "Moderate solar-power potential. ";
 
-    } else {
+    }
+
+    else {
 
         message +=
             "Limited solar-power potential. ";
@@ -1376,28 +1746,38 @@ async function updateComparison() {
     if (!craterData.length) return;
 
 
-    comparisonGrid.innerHTML = "";
+    comparisonGrid.innerHTML =
+        "";
 
 
     const candidates =
         craterData
-            .filter(crater => {
+            .filter(
+                (crater) => {
 
-                const lat =
-                    Number(
-                        crater.lat ??
-                        crater.latitude ??
-                        0
-                    );
-
-                return lat <= -70;
-            })
-            .slice(0, 10);
+                    const lat =
+                        Number(
+                            crater.lat ??
+                            crater.latitude ??
+                            0
+                        );
 
 
-    for (const crater of candidates) {
+                    return lat <= -70;
+                }
+            )
+            .slice(
+                0,
+                10
+            );
 
-        let conditions = null;
+
+    for (
+        const crater of candidates
+    ) {
+
+        let conditions =
+            null;
 
 
         try {
@@ -1409,6 +1789,7 @@ async function updateComparison() {
                     0
                 );
 
+
             const lon =
                 Number(
                     crater.lon ??
@@ -1418,10 +1799,15 @@ async function updateComparison() {
 
 
             const url =
-                `/api/conditions?latitude=${lat}` +
+                `/api/conditions` +
+                `?latitude=${lat}` +
                 `&longitude=${lon}` +
-                `&date=${missionDate.value}` +
-                `&hour=${lunarHour.value}`;
+                `&date=${encodeURIComponent(
+                    missionDate.value
+                )}` +
+                `&hour=${encodeURIComponent(
+                    lunarHour.value
+                )}`;
 
 
             const response =
@@ -1429,11 +1815,14 @@ async function updateComparison() {
 
 
             if (response.ok) {
+
                 conditions =
                     await response.json();
             }
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.warn(
                 "Comparison error:",
@@ -1450,13 +1839,19 @@ async function updateComparison() {
 }
 
 
+/* =========================================================
+   COMPARISON CARD
+========================================================= */
+
 function createComparisonCard(
     crater,
     conditions
 ) {
 
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     card.className =
@@ -1466,7 +1861,7 @@ function createComparisonCard(
     if (
         selectedCrater &&
         selectedCrater.name ===
-        crater.name
+            crater.name
     ) {
 
         card.classList.add(
@@ -1476,19 +1871,22 @@ function createComparisonCard(
 
 
     const power =
-        conditions?.sun
+        conditions
+            ?.sun
             ?.power_potential_percent ??
         "--";
 
 
     const elevation =
-        conditions?.sun
+        conditions
+            ?.sun
             ?.elevation_degrees ??
         "--";
 
 
     const communication =
-        conditions?.communication
+        conditions
+            ?.communication
             ?.status ??
         "--";
 
@@ -1496,22 +1894,32 @@ function createComparisonCard(
     card.innerHTML = `
 
         <div class="comparison-card-name">
-            ${escapeHTML(crater.name)}
+            ${escapeHTML(
+                crater.name
+            )}
         </div>
 
         <div class="comparison-card-row">
             <span>SUN</span>
-            <strong>${elevation}°</strong>
+            <strong>
+                ${elevation}°
+            </strong>
         </div>
 
         <div class="comparison-card-row">
             <span>SOLAR</span>
-            <strong>${power}%</strong>
+            <strong>
+                ${power}%
+            </strong>
         </div>
 
         <div class="comparison-card-row">
             <span>COMM</span>
-            <strong>${escapeHTML(communication)}</strong>
+            <strong>
+                ${escapeHTML(
+                    communication
+                )}
+            </strong>
         </div>
 
     `;
@@ -1520,7 +1928,10 @@ function createComparisonCard(
     card.addEventListener(
         "click",
         () => {
-            selectCrater(crater);
+
+            selectCrater(
+                crater
+            );
         }
     );
 
@@ -1552,6 +1963,7 @@ async function loadMissionData() {
 
 
         if (!craterResponse.ok) {
+
             throw new Error(
                 "Could not load craters."
             );
@@ -1560,6 +1972,18 @@ async function loadMissionData() {
 
         craterData =
             await craterResponse.json();
+
+
+        if (
+            !Array.isArray(
+                craterData
+            )
+        ) {
+
+            throw new Error(
+                "Crater database returned invalid data."
+            );
+        }
 
 
         updateLoading(
@@ -1575,6 +1999,7 @@ async function loadMissionData() {
 
 
         if (!launchResponse.ok) {
+
             throw new Error(
                 "Could not load launch sites."
             );
@@ -1585,6 +2010,18 @@ async function loadMissionData() {
             await launchResponse.json();
 
 
+        if (
+            !Array.isArray(
+                launchData
+            )
+        ) {
+
+            throw new Error(
+                "Launch site database returned invalid data."
+            );
+        }
+
+
         populateLaunchSites();
 
         populateLandingSites();
@@ -1593,13 +2030,18 @@ async function loadMissionData() {
 
 
         updateLoading(
-            85,
+            80,
             "Preparing mission telemetry..."
         );
 
 
         await updateComparison();
 
+
+        updateLoading(
+            95,
+            "Finalizing mission interface..."
+        );
 
     }
 
@@ -1611,11 +2053,7 @@ async function loadMissionData() {
         );
 
 
-        if (loadingText) {
-
-            loadingText.textContent =
-                "DATA LOAD ERROR";
-        }
+        throw error;
     }
 }
 
@@ -1628,27 +2066,33 @@ function populateLaunchSites() {
 
     if (!launchSiteSelect) return;
 
-    launchSiteSelect.innerHTML = "";
+
+    launchSiteSelect.innerHTML =
+        "";
 
 
-    launchData.forEach(site => {
+    launchData.forEach(
+        (site) => {
 
-        const option =
-            document.createElement("option");
-
-
-        option.value =
-            site.name;
-
-
-        option.textContent =
-            `${site.name} — ${site.country}`;
+            const option =
+                document.createElement(
+                    "option"
+                );
 
 
-        launchSiteSelect.appendChild(
-            option
-        );
-    });
+            option.value =
+                site.name;
+
+
+            option.textContent =
+                `${site.name} — ${site.country}`;
+
+
+            launchSiteSelect.appendChild(
+                option
+            );
+        }
+    );
 }
 
 
@@ -1656,27 +2100,33 @@ function populateLandingSites() {
 
     if (!landingSiteSelect) return;
 
-    landingSiteSelect.innerHTML = "";
+
+    landingSiteSelect.innerHTML =
+        "";
 
 
-    craterData.forEach(crater => {
+    craterData.forEach(
+        (crater) => {
 
-        const option =
-            document.createElement("option");
-
-
-        option.value =
-            crater.name;
-
-
-        option.textContent =
-            crater.name;
+            const option =
+                document.createElement(
+                    "option"
+                );
 
 
-        landingSiteSelect.appendChild(
-            option
-        );
-    });
+            option.value =
+                crater.name;
+
+
+            option.textContent =
+                crater.name;
+
+
+            landingSiteSelect.appendChild(
+                option
+            );
+        }
+    );
 }
 
 
@@ -1686,146 +2136,190 @@ function populateLandingSites() {
 
 function setupControls() {
 
-
     /* ANALYZE */
 
-    analyzeButton.addEventListener(
-        "click",
-        analyzeButtonClicked
-    );
+    if (analyzeButton) {
+
+        analyzeButton.addEventListener(
+            "click",
+            analyzeButtonClicked
+        );
+    }
 
 
     /* SITE DROPDOWN */
 
-    landingSiteSelect.addEventListener(
-        "change",
-        () => {
+    if (landingSiteSelect) {
 
-            selectCraterByName(
-                landingSiteSelect.value
-            );
+        landingSiteSelect.addEventListener(
+            "change",
+            () => {
 
-        }
-    );
+                selectCraterByName(
+                    landingSiteSelect.value
+                );
+
+            }
+        );
+    }
 
 
     /* DATE */
 
-    missionDate.addEventListener(
-        "change",
-        () => {
+    if (missionDate) {
 
-            if (selectedCrater) {
-                analyzeSelectedSite();
-                updateComparison();
+        missionDate.addEventListener(
+            "change",
+            () => {
+
+                if (selectedCrater) {
+
+                    analyzeSelectedSite();
+
+                    updateComparison();
+                }
+
             }
-
-        }
-    );
+        );
+    }
 
 
     /* TIME */
 
-    lunarHour.addEventListener(
-        "input",
-        () => {
+    if (lunarHour) {
 
-            const hour =
-                Number(lunarHour.value);
+        lunarHour.addEventListener(
+            "input",
+            () => {
+
+                const hour =
+                    Number(
+                        lunarHour.value
+                    );
 
 
-            lunarHourValue.textContent =
-                formatTime(hour);
+                if (lunarHourValue) {
+
+                    lunarHourValue.textContent =
+                        formatTime(hour);
+                }
 
 
-            if (selectedCrater) {
-                analyzeSelectedSite();
+                if (selectedCrater) {
+
+                    analyzeSelectedSite();
+
+                    updateComparison();
+                }
+
             }
-
-        }
-    );
-
-
-    /* SOUTH POLE FILTER */
-
-    southPoleOnly.addEventListener(
-        "change",
-        updateCraterVisibility
-    );
+        );
+    }
 
 
-    /* MAJOR FILTER */
+    /* FILTERS */
 
-    majorOnly.addEventListener(
-        "change",
-        updateCraterVisibility
-    );
+    if (southPoleOnly) {
+
+        southPoleOnly.addEventListener(
+            "change",
+            updateCraterVisibility
+        );
+    }
+
+
+    if (majorOnly) {
+
+        majorOnly.addEventListener(
+            "change",
+            updateCraterVisibility
+        );
+    }
 
 
     /* RESET */
 
-    resetButton.addEventListener(
-        "click",
-        resetCamera
-    );
+    if (resetButton) {
+
+        resetButton.addEventListener(
+            "click",
+            resetCamera
+        );
+    }
 
 
-    /* ZOOM */
+    /* ZOOM IN */
 
-    zoomIn.addEventListener(
-        "click",
-        () => {
+    if (zoomIn) {
 
-            cameraDistance =
-                Math.max(
-                    3.5,
-                    cameraDistance - 0.8
-                );
+        zoomIn.addEventListener(
+            "click",
+            () => {
 
-            updateCamera();
-
-        }
-    );
+                cameraDistance =
+                    Math.max(
+                        3.3,
+                        cameraDistance - 0.8
+                    );
 
 
-    zoomOut.addEventListener(
-        "click",
-        () => {
-
-            cameraDistance =
-                Math.min(
-                    15,
-                    cameraDistance + 0.8
-                );
-
-            updateCamera();
-
-        }
-    );
+                updateCamera();
+            }
+        );
+    }
 
 
-    /* POLAR VIEW */
+    /* ZOOM OUT */
 
-    viewTop.addEventListener(
-        "click",
-        setPolarView
-    );
+    if (zoomOut) {
+
+        zoomOut.addEventListener(
+            "click",
+            () => {
+
+                cameraDistance =
+                    Math.min(
+                        16,
+                        cameraDistance + 0.8
+                    );
 
 
-    /* GLOBE VIEW */
+                updateCamera();
+            }
+        );
+    }
 
-    viewGlobe.addEventListener(
-        "click",
-        setGlobeView
-    );
+
+    /* POLAR */
+
+    if (viewTop) {
+
+        viewTop.addEventListener(
+            "click",
+            setPolarView
+        );
+    }
+
+
+    /* GLOBE */
+
+    if (viewGlobe) {
+
+        viewGlobe.addEventListener(
+            "click",
+            setGlobeView
+        );
+    }
 }
 
 
 /* =========================================================
-   MOUSE CAMERA
+   CAMERA DRAG
 ========================================================= */
 
-function handlePointerDown(event) {
+function handlePointerDown(
+    event
+) {
 
     isDragging = true;
 
@@ -1837,7 +2331,9 @@ function handlePointerDown(event) {
 }
 
 
-function handlePointerMove(event) {
+function handlePointerMove(
+    event
+) {
 
     if (!isDragging) return;
 
@@ -1845,6 +2341,7 @@ function handlePointerMove(event) {
     const dx =
         event.clientX -
         previousMouse.x;
+
 
     const dy =
         event.clientY -
@@ -1870,12 +2367,12 @@ function handlePointerMove(event) {
     previousMouse.x =
         event.clientX;
 
+
     previousMouse.y =
         event.clientY;
 
 
     updateCamera();
-
 
     updateCursorCoordinates(
         event
@@ -1885,11 +2382,18 @@ function handlePointerMove(event) {
 
 function handlePointerUp() {
 
-    isDragging = false;
+    isDragging =
+        false;
 }
 
 
-function handleWheel(event) {
+/* =========================================================
+   ZOOM
+========================================================= */
+
+function handleWheel(
+    event
+) {
 
     event.preventDefault();
 
@@ -1919,14 +2423,6 @@ function updateCamera() {
     if (!camera) return;
 
 
-    const target =
-        new THREE.Vector3(
-            0,
-            0,
-            0
-        );
-
-
     const x =
         cameraDistance *
         Math.cos(cameraPitch) *
@@ -1952,7 +2448,9 @@ function updateCamera() {
 
 
     camera.lookAt(
-        target
+        0,
+        0,
+        0
     );
 
 
@@ -1970,11 +2468,15 @@ function updateCamera() {
 
 function setPolarView() {
 
-    cameraDistance = 6.3;
+    cameraDistance =
+        6.3;
 
-    cameraYaw = 0;
+    cameraYaw =
+        0;
 
-    cameraPitch = -1.15;
+    cameraPitch =
+        -1.15;
+
 
     updateCamera();
 }
@@ -1982,11 +2484,15 @@ function setPolarView() {
 
 function setGlobeView() {
 
-    cameraDistance = 7.5;
+    cameraDistance =
+        7.5;
 
-    cameraYaw = 0.65;
+    cameraYaw =
+        0.65;
 
-    cameraPitch = 0.35;
+    cameraPitch =
+        0.35;
+
 
     updateCamera();
 }
@@ -1994,11 +2500,15 @@ function setGlobeView() {
 
 function resetCamera() {
 
-    cameraDistance = 7.5;
+    cameraDistance =
+        7.5;
 
-    cameraYaw = 0.65;
+    cameraYaw =
+        0.65;
 
-    cameraPitch = 0.35;
+    cameraPitch =
+        0.35;
+
 
     updateCamera();
 }
@@ -2008,27 +2518,45 @@ function resetCamera() {
    CLICK CRATERS
 ========================================================= */
 
-function handleSceneClick(event) {
+function handleSceneClick(
+    event
+) {
 
-    if (!renderer || !camera) return;
+    if (
+        !renderer ||
+        !camera ||
+        !raycaster
+    ) {
+
+        return;
+    }
 
 
     const rect =
-        renderer.domElement.getBoundingClientRect();
+        renderer.domElement
+            .getBoundingClientRect();
 
 
     mouse.x =
         (
-            (event.clientX - rect.left) /
+            (event.clientX -
+                rect.left) /
             rect.width
-        ) * 2 - 1;
+        ) *
+            2 -
+        1;
 
 
     mouse.y =
         -(
-            (event.clientY - rect.top) /
+            (
+                event.clientY -
+                rect.top
+            ) /
             rect.height
-        ) * 2 + 1;
+        ) *
+            2 +
+        1;
 
 
     raycaster.setFromCamera(
@@ -2044,7 +2572,10 @@ function handleSceneClick(event) {
         );
 
 
-    if (!intersections.length) {
+    if (
+        !intersections.length
+    ) {
+
         return;
     }
 
@@ -2070,29 +2601,46 @@ function handleSceneClick(event) {
    CURSOR COORDINATES
 ========================================================= */
 
-function updateCursorCoordinates(event) {
+function updateCursorCoordinates(
+    event
+) {
 
-    if (!cursorCoords) return;
+    if (
+        !cursorCoords ||
+        !moon ||
+        !renderer ||
+        !camera
+    ) {
 
-    if (!moon) return;
+        return;
+    }
 
 
     const rect =
-        renderer.domElement.getBoundingClientRect();
+        renderer.domElement
+            .getBoundingClientRect();
 
 
     const x =
         (
-            (event.clientX - rect.left) /
+            (event.clientX -
+                rect.left) /
             rect.width
-        ) * 2 - 1;
+        ) *
+            2 -
+        1;
 
 
     const y =
         -(
-            (event.clientY - rect.top) /
+            (
+                event.clientY -
+                rect.top
+            ) /
             rect.height
-        ) * 2 + 1;
+        ) *
+            2 +
+        1;
 
 
     const localRay =
@@ -2100,18 +2648,24 @@ function updateCursorCoordinates(event) {
 
 
     localRay.setFromCamera(
-        new THREE.Vector2(x, y),
+        new THREE.Vector2(
+            x,
+            y
+        ),
         camera
     );
 
 
     const intersections =
         localRay.intersectObject(
-            moon
+            moon,
+            false
         );
 
 
-    if (!intersections.length) {
+    if (
+        !intersections.length
+    ) {
 
         cursorCoords.textContent =
             "LAT -- / LON --";
@@ -2121,7 +2675,8 @@ function updateCursorCoordinates(event) {
 
 
     const point =
-        intersections[0].point.clone();
+        intersections[0]
+            .point.clone();
 
 
     const local =
@@ -2137,7 +2692,8 @@ function updateCursorCoordinates(event) {
     const latitude =
         THREE.MathUtils.radToDeg(
             Math.asin(
-                local.y / radius
+                local.y /
+                radius
             )
         );
 
@@ -2162,7 +2718,13 @@ function updateCursorCoordinates(event) {
 
 function updateSpaceLabels() {
 
-    if (!camera) return;
+    if (
+        !camera ||
+        !renderer
+    ) {
+
+        return;
+    }
 
 
     updateLabelPosition(
@@ -2183,7 +2745,13 @@ function updateLabelPosition(
     label
 ) {
 
-    if (!object || !label) return;
+    if (
+        !object ||
+        !label
+    ) {
+
+        return;
+    }
 
 
     const position =
@@ -2196,25 +2764,36 @@ function updateLabelPosition(
 
 
     const width =
-        renderer.domElement.clientWidth;
+        renderer.domElement
+            .clientWidth;
 
 
     const height =
-        renderer.domElement.clientHeight;
+        renderer.domElement
+            .clientHeight;
 
 
     const x =
-        (position.x * 0.5 + 0.5) *
+        (
+            position.x *
+            0.5 +
+            0.5
+        ) *
         width;
 
 
     const y =
-        (-position.y * 0.5 + 0.5) *
+        (
+            -position.y *
+            0.5 +
+            0.5
+        ) *
         height;
 
 
     label.style.left =
         `${x}px`;
+
 
     label.style.top =
         `${y}px`;
@@ -2233,7 +2812,9 @@ function updateLabelPosition(
 
 function animate() {
 
-    if (!animationStarted) return;
+    if (!animationStarted) {
+        return;
+    }
 
 
     requestAnimationFrame(
@@ -2241,13 +2822,13 @@ function animate() {
     );
 
 
-    if (moon) {
+    /*
+     * Slow rotation.
+     * Crater markers are attached
+     * to the Moon and rotate with it.
+     */
 
-        /*
-         * Very slow rotation.
-         * This makes the globe feel alive without
-         * changing the mission geometry rapidly.
-         */
+    if (moon) {
 
         moon.rotation.y +=
             0.00025;
@@ -2270,6 +2851,7 @@ function animate() {
 
     updateSpaceLabels();
 
+
     renderer.render(
         scene,
         camera
@@ -2287,22 +2869,41 @@ function handleResize() {
         $("three-container");
 
 
-    if (!container || !camera || !renderer) {
+    if (
+        !container ||
+        !camera ||
+        !renderer
+    ) {
+
         return;
     }
 
 
+    const width =
+        Math.max(
+            container.clientWidth,
+            1
+        );
+
+
+    const height =
+        Math.max(
+            container.clientHeight,
+            1
+        );
+
+
     camera.aspect =
-        container.clientWidth /
-        container.clientHeight;
+        width /
+        height;
 
 
     camera.updateProjectionMatrix();
 
 
     renderer.setSize(
-        container.clientWidth,
-        container.clientHeight
+        width,
+        height
     );
 }
 
@@ -2327,10 +2928,14 @@ function clamp(
 }
 
 
-function formatTime(hour) {
+function formatTime(
+    hour
+) {
 
     const h =
-        Math.floor(hour);
+        Math.floor(
+            hour
+        );
 
 
     return `${String(h).padStart(2, "0")}:00`;
@@ -2357,25 +2962,29 @@ function updateLoading(
 }
 
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 }
-
-
-/* =========================================================
-   INITIAL CAMERA
-========================================================= */
-
-setTimeout(() => {
-
-    if (camera) {
-        updateCamera();
-    }
-
-}, 100);
