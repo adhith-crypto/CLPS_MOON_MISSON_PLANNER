@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,87 +13,87 @@
     >
 </head>
 
+
 <body>
 
 <div id="app">
 
-    <!-- =========================================================
+Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.WritePreviewHeadingBold(control b) control⌃ bBItalic(control i) control⌃ iIQuote(control shift right angle bracket) control⌃ shift⇧ right angle bracket>Code(control e) control⌃ eELink(control k) control⌃ kKUnordered list(control 8) control⌃ 88Numbered list(control shift ampersand) control⌃ shift⇧ ampersand&Task list(control shift l) control⌃ shift⇧ lLMentionReferenceMore itemsSaved repliesAdd FilesPaste, drop, or click to add filesCancelComment
+    <!-- =========================================
          TOP MISSION BAR
-    ========================================================== -->
+    ========================================== -->
 
     <header id="topbar">
 
         <div class="brand">
-            <div class="brand-main">
-                LUNAR SOUTH POLE
+
+            <div class="brand-title">
+                LUNAR MISSION PLANNER
             </div>
 
-            <div class="brand-sub">
-                MISSION PLANNER
+            <div class="brand-subtitle">
+                SOUTH POLE SITE ANALYSIS
             </div>
+
         </div>
 
+
         <div class="mission-status">
-            <span class="status-dot"></span>
-            SYSTEM ONLINE
+
+            <span class="status-light"></span>
+
+            <span>
+                MISSION SYSTEM ONLINE
+            </span>
+
         </div>
 
     </header>
 
 
-    <!-- =========================================================
-         MAIN MISSION INTERFACE
-    ========================================================== -->
 
-    <main id="mission-interface">
+    <!-- =========================================
+         MAIN MISSION SCREEN
+    ========================================== -->
+
+    <main id="mission-screen">
 
 
-        <!-- =====================================================
+        <!-- =====================================
              LEFT CONTROL PANEL
-        ====================================================== -->
+        ====================================== -->
 
-        <aside id="controls-panel" class="hud-panel">
+        <aside
+            id="left-panel"
+            class="hud-panel"
+        >
 
-            <div class="panel-title">
-                MISSION CONTROL
+            <div class="panel-heading">
+                MISSION
             </div>
 
-
-            <!-- LAUNCH SITE -->
 
             <div class="control-group">
 
                 <label for="launchSite">
-                    LAUNCH SITE
+                    EARTH LAUNCH SITE
                 </label>
 
-                <select id="launchSite">
-                    <option value="">
-                        Loading launch sites...
-                    </option>
-                </select>
+                <select id="launchSite"></select>
 
             </div>
 
-
-            <!-- LANDING SITE -->
 
             <div class="control-group">
 
                 <label for="landingSite">
-                    LANDING SITE
+                    LUNAR LANDING SITE
                 </label>
 
-                <select id="landingSite">
-                    <option value="">
-                        Loading lunar sites...
-                    </option>
-                </select>
+                <select id="landingSite"></select>
 
             </div>
 
-
-            <!-- MISSION DATE -->
 
             <div class="control-group">
 
@@ -108,133 +109,159 @@
             </div>
 
 
-            <!-- LUNAR HOUR -->
-
             <div class="control-group">
 
                 <label for="lunarHour">
-                    LUNAR HOUR
+                    LUNAR LOCAL TIME
                 </label>
 
-                <input
-                    type="range"
-                    id="lunarHour"
-                    min="0"
-                    max="24"
-                    step="0.5"
-                    value="12"
-                >
 
-                <div class="range-value">
+                <div class="slider-row">
+
+                    <input
+                        type="range"
+                        id="lunarHour"
+                        min="0"
+                        max="24"
+                        step="1"
+                        value="12"
+                    >
+
                     <span id="lunarHourValue">
                         12:00
                     </span>
+
                 </div>
 
             </div>
 
-
-            <!-- FILTERS -->
-
-            <div class="control-group">
-
-                <div class="section-label">
-                    CRATER FILTERS
-                </div>
-
-
-                <label class="checkbox-row">
-
-                    <input
-                        type="checkbox"
-                        id="southPoleOnly"
-                        checked
-                    >
-
-                    <span>
-                        South Pole Sites
-                    </span>
-
-                </label>
-
-
-                <label class="checkbox-row">
-
-                    <input
-                        type="checkbox"
-                        id="majorOnly"
-                        checked
-                    >
-
-                    <span>
-                        Major Craters
-                    </span>
-
-                </label>
-
-            </div>
-
-
-            <!-- ANALYZE -->
 
             <button
+                type="button"
                 id="analyzeButton"
                 class="primary-button"
-                type="button"
             >
-                ANALYZE MISSION
+                ANALYZE SITE
             </button>
 
-
-            <!-- RESET -->
 
             <button
+                type="button"
                 id="resetButton"
                 class="secondary-button"
-                type="button"
             >
-                RESET VIEW
+                RESET CAMERA
             </button>
 
 
-            <!-- CAMERA -->
+            <div class="panel-divider"></div>
 
-            <div class="control-group">
 
-                <div class="section-label">
-                    CAMERA
+            <!-- VISUALIZATION -->
+            <!-- =================================
+                 VISUALIZATION
+            ================================== -->
+
+            <div class="panel-heading">
+                VISUALIZATION
+            </div>
+
+
+            <label class="checkbox-row">
+
+                <input
+                    type="checkbox"
+                    id="southPoleOnly"
+                    checked
+                >
+
+                <span>
+                    South-pole sites
+                </span>
+
+            </label>
+
+
+            <label class="checkbox-row">
+
+                <input
+                    type="checkbox"
+                    id="majorOnly"
+                >
+
+                <span>
+                    Major craters
+                </span>
+
+            </label>
+
+
+            <div class="camera-buttons">
+
+                <button
+                    type="button"
+                    id="zoomIn"
+                >
+                    +
+                </button>
+
+
+                <button
+                    type="button"
+                    id="zoomOut"
+                >
+                    −
+                </button>
+
+
+                <button
+                    type="button"
+                    id="viewTop"
+                >
+                    POLAR
+                </button>
+
+
+                <button
+                    type="button"
+                    id="viewGlobe"
+                >
+                    GLOBE
+                </button>
+
+            </div>
+
+
+            <div class="panel-divider"></div>
+
+
+            <!-- CAMERA HELP -->
+            <!-- =================================
+                 CAMERA HELP
+            ================================== -->
+
+            <div class="panel-heading">
+                CAMERA
+            </div>
+
+
+            <div class="camera-help">
+
+                <div>
+                    <strong>DRAG</strong>
+                    <span>Rotate camera</span>
                 </div>
 
-                <div class="camera-buttons">
 
-                    <button
-                        id="zoomIn"
-                        type="button"
-                    >
-                        +
-                    </button>
+                <div>
+                    <strong>SCROLL</strong>
+                    <span>Zoom</span>
+                </div>
 
-                    <button
-                        id="zoomOut"
-                        type="button"
-                    >
-                        −
-                    </button>
 
-                    <button
-                        id="viewTop"
-                        type="button"
-                    >
-                        POLAR
-                    </button>
-
-                    <button
-                        id="viewGlobe"
-                        type="button"
-                    >
-                        GLOBE
-                    </button>
-
+                <div>
+                    <strong>CLICK</strong>
+                    <span>Select site</span>
                 </div>
 
             </div>
@@ -242,192 +269,206 @@
         </aside>
 
 
-        <!-- =====================================================
+
+        <!-- =====================================
              3D VIEWPORT
-        ====================================================== -->
+        ====================================== -->
 
         <section id="viewport">
+
+
+            <!-- THREE.JS GOES HERE -->
 
             <div id="three-container"></div>
 
 
+
+            <!-- VIEW HEADER -->
+
+            <div id="scene-header">
+
+                <div>
+
+                    <strong>
+                        LUNAR SOUTH POLAR REGION
+                    </strong>
+
+                    <span>
+                        3D MISSION VISUALIZATION
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
             <!-- CENTER RETICLE -->
 
-            <div id="reticle">
+            <div id="target-reticle">
 
-                <div class="reticle-horizontal"></div>
+                <div
+                    class="reticle-corner top-left"
+                ></div>
 
-                <div class="reticle-vertical"></div>
+                <div
+                    class="reticle-corner top-right"
+                ></div>
 
-                <div class="reticle-center"></div>
+                <div
+                    class="reticle-corner bottom-left"
+                ></div>
+
+                <div
+                    class="reticle-corner bottom-right"
+                ></div>
 
             </div>
 
 
-            <!-- SPACE LABELS -->
 
-            <div
-                id="sun-label"
-                class="space-label"
-            >
-                SUN
+            <!-- SPACE OBJECT LABELS -->
+
+            <div id="scene-labels">
+
+                <div
+                    id="sun-label"
+                    class="space-label"
+                >
+                    ☀ SUN
+                    SUN
+                </div>
+
+
+                <div
+                    id="earth-label"
+                    class="space-label"
+                >
+                    EARTH
+                </div>
+
             </div>
 
-
-            <div
-                id="earth-label"
-                class="space-label"
-            >
-                EARTH
-            </div>
 
 
             <!-- CAMERA READOUT -->
 
             <div id="camera-readout">
 
-                CAMERA
+                <div>
+                    CAMERA
+                    CAMERA RANGE
+                </div>
 
-                <span id="cameraDistance">
-                    7.5 km
+                <strong id="cameraDistance">
+                    -- km
+                </strong>
+
+            </div>
+
+
+
+            <!-- COORDINATE READOUT -->
+
+            <div id="coordinate-readout">
+
+                <span id="cursorCoords">
+                    LAT -- / LON --
                 </span>
 
             </div>
 
 
-            <!-- COORDINATES -->
 
-            <div id="cursorCoords">
+            <!-- LOADING SCREEN -->
 
-                LAT -- / LON --
+            <div id="loading-overlay">
+
+                <div class="loading-box">
+
+                    <div class="loading-title">
+                        INITIALIZING MISSION VIEW
+                    </div>
+
+
+                    <div class="loading-bar">
+
+                        <div
+                            id="loadingProgress"
+                        ></div>
+
+                    </div>
+
+
+                    <div id="loadingText">
+                        Loading lunar environment...
+                    </div>
+
+                </div>
 
             </div>
 
         </section>
 
 
-        <!-- =====================================================
+
+        <!-- =====================================
              RIGHT TELEMETRY PANEL
-        ====================================================== -->
+        ====================================== -->
 
-        <aside id="telemetry-panel" class="hud-panel">
+        <aside
+            id="right-panel"
+            class="hud-panel"
+        >
 
-            <div class="panel-title">
+
+            <div class="panel-heading">
                 MISSION TELEMETRY
             </div>
 
 
-            <!-- SITE -->
-
-            <div class="telemetry-section">
-
-                <div class="telemetry-label">
-                    SELECTED SITE
-                </div>
-
-                <div
-                    id="siteName"
-                    class="telemetry-main-value"
-                >
-                    NO SITE SELECTED
-                </div>
-
-            </div>
-
-
-            <!-- LOCATION -->
-
-            <div class="telemetry-row">
-
-                <span>
-                    LATITUDE
-                </span>
-
-                <strong id="siteLatitude">
-                    --
-                </strong>
-
-            </div>
-
-
-            <div class="telemetry-row">
-
-                <span>
-                    LONGITUDE
-                </span>
-
-                <strong id="siteLongitude">
-                    --
-                </strong>
-
-            </div>
-
-
-            <div class="telemetry-row">
-
-                <span>
-                    DIAMETER
-                </span>
-
-                <strong id="siteDiameter">
-                    --
-                </strong>
-
-            </div>
-
-
-            <div class="telemetry-row">
-
-                <span>
-                    REGION
-                </span>
-
-                <strong id="siteRegion">
-                    --
-                </strong>
-
-            </div>
-
 
             <!-- SUN -->
 
-            <div class="telemetry-section">
+            <div class="telemetry-block">
 
                 <div class="telemetry-label">
                     SUN ELEVATION
                 </div>
 
+
                 <div
+                    class="telemetry-value"
                     id="sunElevation"
-                    class="telemetry-main-value"
                 >
-                    --
+                    --°
                 </div>
 
             </div>
 
 
-            <!-- POWER -->
 
-            <div class="telemetry-section">
+            <!-- SOLAR POWER -->
+
+            <div class="telemetry-block">
 
                 <div class="telemetry-label">
                     SOLAR POWER POTENTIAL
                 </div>
 
+
                 <div
+                    class="telemetry-value"
                     id="powerPotential"
-                    class="telemetry-main-value"
                 >
-                    --
+                    --%
                 </div>
+
 
                 <div class="telemetry-bar">
 
                     <div
                         id="powerBar"
-                        class="telemetry-bar-fill"
-                        style="width: 0%;"
                     ></div>
 
                 </div>
@@ -435,27 +476,28 @@
             </div>
 
 
-            <!-- EARTH -->
 
-            <div class="telemetry-section">
+            <!-- EARTH VISIBILITY -->
+
+            <div class="telemetry-block">
 
                 <div class="telemetry-label">
                     EARTH VISIBILITY
                 </div>
 
+
                 <div
+                    class="telemetry-value"
                     id="earthVisibility"
-                    class="telemetry-main-value"
                 >
-                    --
+                    --%
                 </div>
+
 
                 <div class="telemetry-bar">
 
                     <div
                         id="earthBar"
-                        class="telemetry-bar-fill"
-                        style="width: 0%;"
                     ></div>
 
                 </div>
@@ -463,118 +505,203 @@
             </div>
 
 
+
             <!-- COMMUNICATION -->
 
-            <div class="telemetry-row">
+            <div class="telemetry-block">
 
-                <span>
-                    COMMUNICATION
-                </span>
+                <div class="telemetry-label">
+                    DIRECT-TO-EARTH
+                </div>
 
-                <strong id="communicationStatus">
+
+                <div
+                    class="communication-value"
+                    id="communicationStatus"
+                >
                     --
-                </strong>
+                </div>
 
             </div>
+
+
+
+            <div class="panel-divider"></div>
+
+
+
+            <!-- SELECTED SITE -->
+            <!-- =================================
+                 SELECTED SITE
+            ================================== -->
+
+            <div class="panel-heading">
+                SELECTED SITE
+            </div>
+
+
+            <div class="site-data">
+
+
+                <div class="data-row">
+
+                    <span>
+                        NAME
+                    </span>
+
+                    <strong id="siteName">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="data-row">
+
+                    <span>
+                        LATITUDE
+                    </span>
+
+                    <strong id="siteLatitude">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="data-row">
+
+                    <span>
+                        LONGITUDE
+                    </span>
+
+                    <strong id="siteLongitude">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="data-row">
+
+                    <span>
+                        DIAMETER
+                    </span>
+
+                    <strong id="siteDiameter">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="data-row">
+
+                    <span>
+                        REGION
+                    </span>
+
+                    <strong id="siteRegion">
+                        --
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="panel-divider"></div>
+
 
 
             <!-- ASSESSMENT -->
+            <!-- =================================
+                 ASSESSMENT
+            ================================== -->
 
-            <div class="telemetry-section">
-
-                <div class="telemetry-label">
-                    MISSION ASSESSMENT
-                </div>
-
-                <div
-                    id="assessment"
-                    class="assessment"
-                >
-                    Select a landing site and analyze the mission.
-                </div>
-
+            <div class="panel-heading">
+                MISSION ASSESSMENT
             </div>
 
+
+            <div
+                id="assessment"
+                class="assessment"
+            >
+                Select a landing site.
+            </div>
+
+
         </aside>
+
 
     </main>
 
 
-    <!-- =========================================================
-         COMPARISON PANEL
-    ========================================================== -->
 
-    <section
-        id="comparison-panel"
-        class="hud-panel"
-    >
+    <!-- =========================================
+         BOTTOM COMPARISON PANEL
+    ========================================== -->
 
-        <div class="panel-title">
-            SOUTH POLE SITE COMPARISON
-        </div>
+    <section id="comparison-panel">
 
-        <div id="comparisonGrid">
 
-            <div class="empty-comparison">
-                Loading candidate sites...
+        <div class="comparison-title">
+
+            <div>
+
+                <strong>
+                    LANDING SITE COMPARISON
+                </strong>
+
+                <span>
+                    Candidate sites for current mission conditions
+                </span>
+
             </div>
 
         </div>
+
+
+        <div
+            id="comparisonGrid"
+            class="comparison-grid"
+        ></div>
+
 
     </section>
-
-
-    <!-- =========================================================
-         LOADING OVERLAY
-         IMPORTANT: app.js expects these exact IDs.
-    ========================================================== -->
-
-    <div id="loading-overlay">
-
-        <div class="loading-box">
-
-            <div class="loading-title">
-                LUNAR MISSION SYSTEM
-            </div>
-
-            <div
-                id="loadingText"
-                class="loading-text"
-            >
-                Initializing 3D environment...
-            </div>
-
-            <div class="loading-bar">
-
-                <div
-                    id="loadingProgress"
-                    class="loading-progress"
-                    style="width: 0%;"
-                ></div>
-
-            </div>
-
-        </div>
-
-    </div>
 
 
 </div>
 
 
-<!-- =========================================================
+
+<!-- =========================================
      THREE.JS
-========================================================== -->
+     
+     IMPORTANT:
+     Use the non-module build because app.js
+     accesses THREE through window.THREE.
+========================================== -->
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"
+    src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"
+></script>
 
 
-<!-- =========================================================
-     YOUR APP
-========================================================== -->
 
-<script src="{{ url_for('static', filename='app.js') }}"></script>
+<!-- =========================================
+     APPLICATION
+========================================== -->
+
+<script
+    src="{{ url_for('static', filename='app.js') }}"
+></script>
 
 
 </body>
+
 </html>
