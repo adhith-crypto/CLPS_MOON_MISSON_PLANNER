@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Kennedy Space Center",
+    "country": "United States",
+    "lat": 28.5729,
+    "lon": -80.6490,
+    "type": "Orbital Launch Site"
+  },
+  {
+    "name": "Vandenberg Space Force Base",
+    "country": "United States",
+    "lat": 34.7420,
+    "lon": -120.5724,
+    "type": "Orbital Launch Site"
+  },
+  {
+    "name": "Satish Dhawan Space Centre",
+    "country": "India",
+    "lat": 13.7199,
+    "lon": 80.2304,
+    "type": "Orbital Launch Site"
+  },
+  {
+    "name": "Guiana Space Centre",
+    "country": "French Guiana",
+    "lat": 5.2360,
+    "lon": -52.7680,
+    "type": "Orbital Launch Site"
+  },
+  {
+    "name": "Tanegashima Space Center",
+    "country": "Japan",
+    "lat": 30.4000,
+    "lon": 130.9700,
+    "type": "Orbital Launch Site"
+  }
+]
