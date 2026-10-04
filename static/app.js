@@ -12,10 +12,11 @@ let renderer;
 let moon;
 let earth;
 let sun;
+let sunLight;
 let atmosphere;
 
 let craterGroup;
-let earthOrbitGroup;
+let moonOrbitGroup;
 
 let craterData = [];
 let launchData = [];
@@ -44,262 +45,160 @@ let animationStarted = false;
    DOM
 ========================================================= */
 
-const $ = (id) =>
-    document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
-const launchSiteSelect =
-    $("launchSite");
+const launchSiteSelect = $("launchSite");
+const landingSiteSelect = $("landingSite");
+const missionDate = $("missionDate");
+const lunarHour = $("lunarHour");
+const lunarHourValue = $("lunarHourValue");
 
-const landingSiteSelect =
-    $("landingSite");
+const analyzeButton = $("analyzeButton");
+const resetButton = $("resetButton");
 
-const missionDate =
-    $("missionDate");
+const southPoleOnly = $("southPoleOnly");
+const majorOnly = $("majorOnly");
 
-const lunarHour =
-    $("lunarHour");
+const zoomIn = $("zoomIn");
+const zoomOut = $("zoomOut");
+const viewTop = $("viewTop");
+const viewGlobe = $("viewGlobe");
 
-const lunarHourValue =
-    $("lunarHourValue");
+const sunElevation = $("sunElevation");
+const powerPotential = $("powerPotential");
+const earthVisibility = $("earthVisibility");
+const communicationStatus = $("communicationStatus");
 
-const analyzeButton =
-    $("analyzeButton");
+const powerBar = $("powerBar");
+const earthBar = $("earthBar");
 
-const resetButton =
-    $("resetButton");
+const siteName = $("siteName");
+const siteLatitude = $("siteLatitude");
+const siteLongitude = $("siteLongitude");
+const siteDiameter = $("siteDiameter");
+const siteRegion = $("siteRegion");
 
-const southPoleOnly =
-    $("southPoleOnly");
+const assessment = $("assessment");
+const comparisonGrid = $("comparisonGrid");
 
-const majorOnly =
-    $("majorOnly");
+const cameraDistanceDisplay = $("cameraDistance");
+const cursorCoords = $("cursorCoords");
 
-const zoomIn =
-    $("zoomIn");
+const sunLabel = $("sun-label");
+const earthLabel = $("earth-label");
 
-const zoomOut =
-    $("zoomOut");
-
-const viewTop =
-    $("viewTop");
-
-const viewGlobe =
-    $("viewGlobe");
-
-const sunElevation =
-    $("sunElevation");
-
-const powerPotential =
-    $("powerPotential");
-
-const earthVisibility =
-    $("earthVisibility");
-
-const communicationStatus =
-    $("communicationStatus");
-
-const powerBar =
-    $("powerBar");
-
-const earthBar =
-    $("earthBar");
-
-const siteName =
-    $("siteName");
-
-const siteLatitude =
-    $("siteLatitude");
-
-const siteLongitude =
-    $("siteLongitude");
-
-const siteDiameter =
-    $("siteDiameter");
-
-const siteRegion =
-    $("siteRegion");
-
-const assessment =
-    $("assessment");
-
-const comparisonGrid =
-    $("comparisonGrid");
-
-const cameraDistanceDisplay =
-    $("cameraDistance");
-
-const cursorCoords =
-    $("cursorCoords");
-
-const sunLabel =
-    $("sun-label");
-
-const earthLabel =
-    $("earth-label");
-
-const loadingOverlay =
-    $("loading-overlay");
-
-const loadingProgress =
-    $("loadingProgress");
-
-const loadingText =
-    $("loadingText");
+const loadingOverlay = $("loading-overlay");
+const loadingProgress = $("loadingProgress");
+const loadingText = $("loadingText");
 
 
 /* =========================================================
    STARTUP
 ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
-        try {
+    try {
 
-            if (!THREE) {
-
-                throw new Error(
-                    "Three.js failed to load."
-                );
-            }
-
-            setDefaultDate();
-
-            initializeThree();
-
-            setupControls();
-
-            updateLoading(
-                15,
-                "Initializing 3D environment..."
-            );
-
-            await loadMissionData();
-
-            updateLoading(
-                100,
-                "Mission environment ready."
-            );
-
-            setTimeout(
-                () => {
-
-                    if (loadingOverlay) {
-
-                        loadingOverlay.style.opacity =
-                            "0";
-
-                        setTimeout(
-                            () => {
-
-                                loadingOverlay.style.display =
-                                    "none";
-
-                            },
-                            500
-                        );
-                    }
-
-                },
-                400
-            );
-
-            if (
-                landingSiteSelect &&
-                landingSiteSelect.options.length
-            ) {
-
-                landingSiteSelect.selectedIndex =
-                    0;
-
-                selectCraterByName(
-                    landingSiteSelect.value
-                );
-            }
-
-            animationStarted =
-                true;
-
-            animate();
-
+        if (!THREE) {
+            throw new Error("Three.js failed to load.");
         }
 
-        catch (error) {
+        setDefaultDate();
 
-            console.error(
-                "STARTUP ERROR:",
-                error
-            );
+        initializeThree();
 
-            showLoadingError(
-                error.message
+        setupControls();
+
+        updateLoading(
+            15,
+            "Initializing 3D environment..."
+        );
+
+        await loadMissionData();
+
+        updateLoading(
+            100,
+            "Mission environment ready."
+        );
+
+        setTimeout(() => {
+
+            if (loadingOverlay) {
+
+                loadingOverlay.style.opacity = "0";
+
+                setTimeout(() => {
+                    loadingOverlay.style.display = "none";
+                }, 500);
+            }
+
+        }, 400);
+
+        if (
+            landingSiteSelect &&
+            landingSiteSelect.options.length
+        ) {
+
+            landingSiteSelect.selectedIndex = 0;
+
+            selectCraterByName(
+                landingSiteSelect.value
             );
         }
+
+        animationStarted = true;
+
+        animate();
+
+    } catch (error) {
+
+        console.error("STARTUP ERROR:", error);
+
+        showLoadingError(error.message);
     }
-);
+});
 
 
 /* =========================================================
-   LOADING ERROR
+   ERROR
 ========================================================= */
 
-function showLoadingError(
-    message
-) {
+function showLoadingError(message) {
 
     if (loadingText) {
-
         loadingText.textContent =
             `SYSTEM ERROR: ${message}`;
     }
 
     if (loadingProgress) {
-
-        loadingProgress.style.width =
-            "100%";
+        loadingProgress.style.width = "100%";
     }
 
     if (loadingOverlay) {
-
-        loadingOverlay.style.opacity =
-            "1";
-
-        loadingOverlay.style.display =
-            "flex";
+        loadingOverlay.style.opacity = "1";
+        loadingOverlay.style.display = "flex";
     }
 }
 
 
 /* =========================================================
-   DEFAULT DATE
+   DATE
 ========================================================= */
 
 function setDefaultDate() {
 
     if (!missionDate) return;
 
-    const now =
-        new Date();
+    const now = new Date();
 
-    const year =
-        now.getFullYear();
+    const year = now.getFullYear();
 
     const month =
-        String(
-            now.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
+        String(now.getMonth() + 1).padStart(2, "0");
 
     const day =
-        String(
-            now.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
+        String(now.getDate()).padStart(2, "0");
 
     missionDate.value =
         `${year}-${month}-${day}`;
@@ -312,39 +211,30 @@ function setDefaultDate() {
 
 function initializeThree() {
 
-    const container =
-        $("three-container");
+    const container = $("three-container");
 
     if (!container) {
-
-        throw new Error(
-            "3D container not found."
-        );
+        throw new Error("3D container not found.");
     }
 
-    scene =
-        new THREE.Scene();
+    scene = new THREE.Scene();
 
     scene.background =
-        new THREE.Color(
-            0x020304
-        );
+        new THREE.Color(0x020304);
 
 
-    /* CAMERA */
+    /* =====================================================
+       CAMERA
+    ===================================================== */
 
     camera =
         new THREE.PerspectiveCamera(
             45,
             container.clientWidth /
-                Math.max(
-                    container.clientHeight,
-                    1
-                ),
+                Math.max(container.clientHeight, 1),
             0.01,
             1000
         );
-
 
     camera.position.set(
         5,
@@ -353,14 +243,15 @@ function initializeThree() {
     );
 
 
-    /* RENDERER */
+    /* =====================================================
+       RENDERER
+    ===================================================== */
 
     renderer =
         new THREE.WebGLRenderer({
             antialias: true,
             logarithmicDepthBuffer: true
         });
-
 
     renderer.setPixelRatio(
         Math.min(
@@ -369,12 +260,10 @@ function initializeThree() {
         )
     );
 
-
     renderer.setSize(
         container.clientWidth,
         container.clientHeight
     );
-
 
     if (
         "outputColorSpace" in renderer &&
@@ -385,22 +274,21 @@ function initializeThree() {
             THREE.SRGBColorSpace;
     }
 
-
-    renderer.shadowMap.enabled =
-        true;
-
+    renderer.shadowMap.enabled = true;
 
     container.appendChild(
         renderer.domElement
     );
 
 
-    /* LIGHT */
+    /* =====================================================
+       SOFT AMBIENT LIGHT
+    ===================================================== */
 
     const ambientLight =
         new THREE.AmbientLight(
-            0x505050,
-            1.5
+            0x383c42,
+            0.45
         );
 
     scene.add(
@@ -408,32 +296,35 @@ function initializeThree() {
     );
 
 
-    const sunlight =
+    /* =====================================================
+       SUNLIGHT
+       MUCH LOWER THAN BEFORE
+    ===================================================== */
+
+    sunLight =
         new THREE.PointLight(
-            0xffffff,
-            500,
+            0xffe4a0,
+            35,
             0,
             2
         );
 
-
-    sunlight.position.set(
+    sunLight.position.set(
         12,
         5,
         8
     );
 
-
-    sunlight.castShadow =
-        true;
-
+    sunLight.castShadow = true;
 
     scene.add(
-        sunlight
+        sunLight
     );
 
 
-    /* SPACE */
+    /* =====================================================
+       SPACE
+    ===================================================== */
 
     createStars();
 
@@ -441,12 +332,14 @@ function initializeThree() {
 
     createEarth();
 
-    createEarthOrbitLines();
+    createMoonOrbit();
 
     createSun();
 
 
-    /* RAYCASTING */
+    /* =====================================================
+       RAYCASTING
+    ===================================================== */
 
     raycaster =
         new THREE.Raycaster();
@@ -455,37 +348,34 @@ function initializeThree() {
         new THREE.Vector2();
 
 
-    /* EVENTS */
+    /* =====================================================
+       EVENTS
+    ===================================================== */
 
     window.addEventListener(
         "resize",
         handleResize
     );
 
-
     renderer.domElement.addEventListener(
         "pointerdown",
         handlePointerDown
     );
-
 
     renderer.domElement.addEventListener(
         "pointermove",
         handlePointerMove
     );
 
-
     renderer.domElement.addEventListener(
         "pointerup",
         handlePointerUp
     );
 
-
     renderer.domElement.addEventListener(
         "pointerleave",
         handlePointerUp
     );
-
 
     renderer.domElement.addEventListener(
         "wheel",
@@ -495,12 +385,10 @@ function initializeThree() {
         }
     );
 
-
     renderer.domElement.addEventListener(
         "click",
         handleSceneClick
     );
-
 
     updateCamera();
 }
@@ -517,29 +405,18 @@ function createStars() {
 
     const positions = [];
 
-
-    for (
-        let i = 0;
-        i < 1800;
-        i++
-    ) {
+    for (let i = 0; i < 1800; i++) {
 
         const radius =
-            70 +
-            Math.random() * 120;
+            70 + Math.random() * 120;
 
         const theta =
-            Math.random() *
-            Math.PI *
-            2;
+            Math.random() * Math.PI * 2;
 
         const phi =
             Math.acos(
-                2 *
-                Math.random() -
-                1
+                2 * Math.random() - 1
             );
-
 
         positions.push(
             radius *
@@ -547,12 +424,10 @@ function createStars() {
             Math.cos(theta)
         );
 
-
         positions.push(
             radius *
             Math.cos(phi)
         );
-
 
         positions.push(
             radius *
@@ -560,7 +435,6 @@ function createStars() {
             Math.sin(theta)
         );
     }
-
 
     geometry.setAttribute(
         "position",
@@ -570,7 +444,6 @@ function createStars() {
         )
     );
 
-
     const material =
         new THREE.PointsMaterial({
             color: 0xd7ddd7,
@@ -578,17 +451,13 @@ function createStars() {
             sizeAttenuation: true
         });
 
-
     const stars =
         new THREE.Points(
             geometry,
             material
         );
 
-
-    scene.add(
-        stars
-    );
+    scene.add(stars);
 }
 
 
@@ -599,27 +468,15 @@ function createStars() {
 function createMoonTexture() {
 
     const canvas =
-        document.createElement(
-            "canvas"
-        );
+        document.createElement("canvas");
 
-
-    canvas.width =
-        1024;
-
-    canvas.height =
-        512;
-
+    canvas.width = 1024;
+    canvas.height = 512;
 
     const ctx =
-        canvas.getContext(
-            "2d"
-        );
+        canvas.getContext("2d");
 
-
-    ctx.fillStyle =
-        "#777773";
-
+    ctx.fillStyle = "#777773";
 
     ctx.fillRect(
         0,
@@ -629,30 +486,19 @@ function createMoonTexture() {
     );
 
 
-    /* SURFACE */
-
-    for (
-        let i = 0;
-        i < 30000;
-        i++
-    ) {
+    for (let i = 0; i < 30000; i++) {
 
         const x =
-            Math.random() *
-            canvas.width;
+            Math.random() * canvas.width;
 
         const y =
-            Math.random() *
-            canvas.height;
+            Math.random() * canvas.height;
 
         const brightness =
-            75 +
-            Math.random() * 65;
-
+            75 + Math.random() * 65;
 
         ctx.fillStyle =
             `rgb(${brightness},${brightness},${brightness - 3})`;
-
 
         ctx.fillRect(
             x,
@@ -663,27 +509,16 @@ function createMoonTexture() {
     }
 
 
-    /* CRATERS */
-
-    for (
-        let i = 0;
-        i < 140;
-        i++
-    ) {
+    for (let i = 0; i < 140; i++) {
 
         const x =
-            Math.random() *
-            canvas.width;
+            Math.random() * canvas.width;
 
         const y =
-            Math.random() *
-            canvas.height;
+            Math.random() * canvas.height;
 
         const radius =
-            3 +
-            Math.random() *
-            30;
-
+            3 + Math.random() * 30;
 
         const gradient =
             ctx.createRadialGradient(
@@ -695,31 +530,24 @@ function createMoonTexture() {
                 radius
             );
 
-
         gradient.addColorStop(
             0,
             "rgba(40,40,38,0.7)"
         );
-
 
         gradient.addColorStop(
             0.65,
             "rgba(75,75,72,0.5)"
         );
 
-
         gradient.addColorStop(
             1,
             "rgba(170,170,165,0)"
         );
 
-
-        ctx.fillStyle =
-            gradient;
-
+        ctx.fillStyle = gradient;
 
         ctx.beginPath();
-
 
         ctx.arc(
             x,
@@ -729,33 +557,19 @@ function createMoonTexture() {
             Math.PI * 2
         );
 
-
         ctx.fill();
     }
 
-
-    return new THREE.CanvasTexture(
-        canvas
-    );
+    return new THREE.CanvasTexture(canvas);
 }
 
 
 /* =========================================================
    MOON
-   SMALLER THAN EARTH
+   SMALL
 ========================================================= */
 
 function createMoon() {
-
-    /*
-     * EARTH:
-     * 0.95 radius
-     *
-     * MOON:
-     * 0.42 radius
-     *
-     * This makes Earth clearly larger.
-     */
 
     const geometry =
         new THREE.SphereGeometry(
@@ -764,10 +578,8 @@ function createMoon() {
             48
         );
 
-
     const texture =
         createMoonTexture();
-
 
     const material =
         new THREE.MeshStandardMaterial({
@@ -781,9 +593,7 @@ function createMoon() {
             bumpMap: texture,
 
             bumpScale: 0.035
-
         });
-
 
     moon =
         new THREE.Mesh(
@@ -791,59 +601,31 @@ function createMoon() {
             material
         );
 
-
-    /*
-     * Keep Moon as the main
-     * mission object.
-     */
-
     moon.position.set(
         0,
         0,
         0
     );
 
+    moon.castShadow = true;
+    moon.receiveShadow = true;
 
-    moon.rotation.y =
-        -0.35;
+    scene.add(moon);
 
-
-    moon.castShadow =
-        true;
-
-
-    moon.receiveShadow =
-        true;
-
-
-    scene.add(
-        moon
-    );
-
-
-    /* CRATERS */
 
     craterGroup =
         new THREE.Group();
 
-
-    moon.add(
-        craterGroup
-    );
+    moon.add(craterGroup);
 }
 
 
 /* =========================================================
    EARTH
-   BIGGER + FARTHER AWAY
+   BIGGER THAN MOON
 ========================================================= */
 
 function createEarth() {
-
-    /*
-     * Earth is intentionally
-     * larger than the Moon.
-     */
 
     const geometry =
         new THREE.SphereGeometry(
@@ -854,29 +636,18 @@ function createEarth() {
 
 
     const canvas =
-        document.createElement(
-            "canvas"
-        );
+        document.createElement("canvas");
 
-
-    canvas.width =
-        1024;
-
-    canvas.height =
-        512;
-
+    canvas.width = 1024;
+    canvas.height = 512;
 
     const ctx =
-        canvas.getContext(
-            "2d"
-        );
+        canvas.getContext("2d");
 
 
     /* OCEAN */
 
-    ctx.fillStyle =
-        "#16466d";
-
+    ctx.fillStyle = "#16466d";
 
     ctx.fillRect(
         0,
@@ -888,17 +659,12 @@ function createEarth() {
 
     /* LAND */
 
-    for (
-        let i = 0;
-        i < 65;
-        i++
-    ) {
+    for (let i = 0; i < 65; i++) {
 
         ctx.fillStyle =
             i % 2 === 0
                 ? "#4e7049"
                 : "#637e52";
-
 
         const x =
             Math.random() *
@@ -909,18 +675,12 @@ function createEarth() {
             canvas.height;
 
         const w =
-            20 +
-            Math.random() *
-            120;
+            20 + Math.random() * 120;
 
         const h =
-            10 +
-            Math.random() *
-            55;
-
+            10 + Math.random() * 55;
 
         ctx.beginPath();
-
 
         ctx.ellipse(
             x,
@@ -932,22 +692,16 @@ function createEarth() {
             Math.PI * 2
         );
 
-
         ctx.fill();
     }
 
 
     /* CLOUDS */
 
-    for (
-        let i = 0;
-        i < 70;
-        i++
-    ) {
+    for (let i = 0; i < 70; i++) {
 
         ctx.fillStyle =
             "rgba(240,245,245,0.32)";
-
 
         const x =
             Math.random() *
@@ -957,31 +711,24 @@ function createEarth() {
             Math.random() *
             canvas.height;
 
-
         ctx.beginPath();
-
 
         ctx.ellipse(
             x,
             y,
-            15 +
-                Math.random() * 45,
-            3 +
-                Math.random() * 8,
+            15 + Math.random() * 45,
+            3 + Math.random() * 8,
             0,
             0,
             Math.PI * 2
         );
-
 
         ctx.fill();
     }
 
 
     const texture =
-        new THREE.CanvasTexture(
-            canvas
-        );
+        new THREE.CanvasTexture(canvas);
 
 
     const material =
@@ -992,7 +739,6 @@ function createEarth() {
             roughness: 0.62,
 
             metalness: 0
-
         });
 
 
@@ -1004,7 +750,7 @@ function createEarth() {
 
 
     /*
-     * FARTHER FROM THE MOON
+     * FAR AWAY FROM MOON
      */
 
     earth.position.set(
@@ -1014,17 +760,10 @@ function createEarth() {
     );
 
 
-    earth.castShadow =
-        true;
+    earth.castShadow = true;
+    earth.receiveShadow = true;
 
-
-    earth.receiveShadow =
-        true;
-
-
-    scene.add(
-        earth
-    );
+    scene.add(earth);
 
 
     /* ATMOSPHERE */
@@ -1036,7 +775,6 @@ function createEarth() {
             32
         );
 
-
     const atmosphereMaterial =
         new THREE.MeshBasicMaterial({
 
@@ -1044,12 +782,10 @@ function createEarth() {
 
             transparent: true,
 
-            opacity: 0.13,
+            opacity: 0.08,
 
             side: THREE.BackSide
-
         });
-
 
     atmosphere =
         new THREE.Mesh(
@@ -1057,151 +793,130 @@ function createEarth() {
             atmosphereMaterial
         );
 
-
-    earth.add(
-        atmosphere
-    );
+    earth.add(atmosphere);
 }
 
 
 /* =========================================================
-   EARTH ORBIT / TRAJECTORY LINES
+   MOON ORBIT AROUND EARTH
+   THIS IS NOT A RING SYSTEM
 ========================================================= */
 
-function createEarthOrbitLines() {
+function createMoonOrbit() {
 
-    earthOrbitGroup =
+    moonOrbitGroup =
         new THREE.Group();
 
 
     /*
-     * Orbit center is Earth.
+     * The orbit is centered on Earth.
+     *
+     * Earth is at:
+     * (-7.5, 3.5, -4.5)
+     *
+     * The line therefore represents
+     * the Moon's orbital path around Earth.
      */
 
-    const orbitRadii = [
-        1.55,
-        1.95,
-        2.35
-    ];
+    const points = [];
+
+    const segments = 240;
+
+    const orbitRadius = 1.65;
 
 
-    orbitRadii.forEach(
-        (radius, index) => {
+    for (
+        let i = 0;
+        i <= segments;
+        i++
+    ) {
 
-            const points = [];
-
-            const segments = 160;
-
-
-            for (
-                let i = 0;
-                i <= segments;
-                i++
-            ) {
-
-                const angle =
-                    (
-                        i /
-                        segments
-                    ) *
-                    Math.PI *
-                    2;
+        const angle =
+            (
+                i / segments
+            ) *
+            Math.PI *
+            2;
 
 
-                const x =
-                    Math.cos(angle) *
-                    radius;
+        const x =
+            Math.cos(angle) *
+            orbitRadius;
 
 
-                const z =
-                    Math.sin(angle) *
-                    radius;
+        const z =
+            Math.sin(angle) *
+            orbitRadius;
 
 
-                /*
-                 * Slight inclination
-                 * gives the orbital
-                 * trajectory a 3D look.
-                 */
+        /*
+         * Small inclination so it
+         * looks like a real 3D
+         * orbital plane.
+         */
 
-                const y =
-                    Math.sin(angle * 2) *
-                    (
-                        0.12 +
-                        index * 0.035
-                    );
+        const y =
+            Math.sin(angle) *
+            0.22;
 
 
-                points.push(
-                    new THREE.Vector3(
-                        x,
-                        y,
-                        z
-                    )
-                );
-            }
+        points.push(
+            new THREE.Vector3(
+                x,
+                y,
+                z
+            )
+        );
+    }
 
 
-            const geometry =
-                new THREE.BufferGeometry()
-                    .setFromPoints(
-                        points
-                    );
+    const geometry =
+        new THREE.BufferGeometry()
+            .setFromPoints(points);
 
 
-            const material =
-                new THREE.LineBasicMaterial({
+    const material =
+        new THREE.LineBasicMaterial({
 
-                    color:
-                        index === 0
-                            ? 0x9fb38b
-                            : 0x64735c,
+            color: 0x82956e,
 
-                    transparent: true,
+            transparent: true,
 
-                    opacity:
-                        index === 0
-                            ? 0.8
-                            : 0.45
-
-                });
+            opacity: 0.55
+        });
 
 
-            const orbit =
-                new THREE.LineLoop(
-                    geometry,
-                    material
-                );
+    const orbit =
+        new THREE.LineLoop(
+            geometry,
+            material
+        );
 
 
-            /*
-             * Parent the trajectory
-             * to Earth so it stays
-             * centered on Earth.
-             */
-
-            orbit.position.set(
-                0,
-                0,
-                0
-            );
-
-
-            earthOrbitGroup.add(
-                orbit
-            );
-        }
+    moonOrbitGroup.add(
+        orbit
     );
 
 
-    earth.add(
-        earthOrbitGroup
+    /*
+     * Position the orbital
+     * plane around EARTH.
+     */
+
+    moonOrbitGroup.position.copy(
+        earth.position
+    );
+
+
+    scene.add(
+        moonOrbitGroup
     );
 }
 
 
 /* =========================================================
    SUN
+   DIMMER VISUAL
 ========================================================= */
 
 function createSun() {
@@ -1216,7 +931,8 @@ function createSun() {
 
     const material =
         new THREE.MeshBasicMaterial({
-            color: 0xffd76a
+
+            color: 0xd8ad52
         });
 
 
@@ -1234,16 +950,16 @@ function createSun() {
     );
 
 
-    scene.add(
-        sun
-    );
+    scene.add(sun);
 
 
-    /* GLOW */
+    /*
+     * MUCH SMALLER GLOW
+     */
 
     const glowGeometry =
         new THREE.SphereGeometry(
-            1.5,
+            1.32,
             32,
             32
         );
@@ -1252,14 +968,13 @@ function createSun() {
     const glowMaterial =
         new THREE.MeshBasicMaterial({
 
-            color: 0xffb83e,
+            color: 0xd09a3e,
 
             transparent: true,
 
-            opacity: 0.13,
+            opacity: 0.035,
 
             side: THREE.BackSide
-
         });
 
 
@@ -1270,9 +985,7 @@ function createSun() {
         );
 
 
-    sun.add(
-        glow
-    );
+    sun.add(glow);
 }
 
 
@@ -1291,29 +1004,24 @@ function latitudeLongitudeToVector(
             latitude
         );
 
-
     const lon =
         THREE.MathUtils.degToRad(
             longitude
         );
-
 
     const x =
         radius *
         Math.cos(lat) *
         Math.cos(lon);
 
-
     const y =
         radius *
         Math.sin(lat);
-
 
     const z =
         radius *
         Math.cos(lat) *
         Math.sin(lon);
-
 
     return new THREE.Vector3(
         x,
@@ -1331,7 +1039,6 @@ function createCraterMarkers() {
 
     if (!craterGroup) return;
 
-
     while (
         craterGroup.children.length
     ) {
@@ -1340,7 +1047,6 @@ function createCraterMarkers() {
             craterGroup.children[0]
         );
     }
-
 
     craterMeshes = [];
 
@@ -1355,7 +1061,6 @@ function createCraterMarkers() {
                     0
                 );
 
-
             const longitude =
                 Number(
                     crater.lon ??
@@ -1363,10 +1068,8 @@ function createCraterMarkers() {
                     0
                 );
 
-
             const isSouthPole =
                 latitude <= -70;
-
 
             const isMajor =
                 !isSouthPole;
@@ -1397,7 +1100,6 @@ function createCraterMarkers() {
                         isSouthPole
                             ? 0xaacb7b
                             : 0xd6d6d6
-
                 });
 
 
@@ -1416,26 +1118,19 @@ function createCraterMarkers() {
             marker.userData.crater =
                 crater;
 
-
             marker.userData.isSouthPole =
                 isSouthPole;
-
 
             marker.userData.isMajor =
                 isMajor;
 
 
-            craterGroup.add(
-                marker
-            );
+            craterGroup.add(marker);
+
+            craterMeshes.push(marker);
 
 
-            craterMeshes.push(
-                marker
-            );
-
-
-            /* SOUTH POLE RING */
+            /* SOUTH POLE MARKER */
 
             if (isSouthPole) {
 
@@ -1456,9 +1151,7 @@ function createCraterMarkers() {
 
                         opacity: 0.7,
 
-                        side:
-                            THREE.DoubleSide
-
+                        side: THREE.DoubleSide
                     });
 
 
@@ -1472,9 +1165,7 @@ function createCraterMarkers() {
                 ring.position.copy(
                     position
                         .clone()
-                        .multiplyScalar(
-                            1.002
-                        )
+                        .multiplyScalar(1.002)
                 );
 
 
@@ -1490,23 +1181,16 @@ function createCraterMarkers() {
                 ring.userData.crater =
                     crater;
 
-
                 ring.userData.isSouthPole =
                     true;
-
 
                 ring.userData.isMajor =
                     false;
 
 
-                craterGroup.add(
-                    ring
-                );
+                craterGroup.add(ring);
 
-
-                craterMeshes.push(
-                    ring
-                );
+                craterMeshes.push(ring);
             }
         }
     );
@@ -1531,9 +1215,7 @@ function updateCraterVisibility() {
             const isMajor =
                 mesh.userData.isMajor;
 
-
-            let visible =
-                false;
+            let visible = false;
 
 
             /*
@@ -1546,18 +1228,15 @@ function updateCraterVisibility() {
                 southPoleOnly.checked
             ) {
 
-                visible =
-                    true;
+                visible = true;
             }
-
 
             if (
                 isMajor &&
                 majorOnly.checked
             ) {
 
-                visible =
-                    true;
+                visible = true;
             }
 
 
@@ -1572,15 +1251,11 @@ function updateCraterVisibility() {
    SELECT CRATER
 ========================================================= */
 
-function selectCrater(
-    crater
-) {
+function selectCrater(crater) {
 
     if (!crater) return;
 
-
-    selectedCrater =
-        crater;
+    selectedCrater = crater;
 
 
     if (landingSiteSelect) {
@@ -1605,9 +1280,7 @@ function selectCrater(
                     2.5
                 );
 
-            }
-
-            else {
+            } else {
 
                 mesh.scale.set(
                     1,
@@ -1623,34 +1296,25 @@ function selectCrater(
         crater
     );
 
-
     analyzeSelectedSite();
 
     updateComparison();
 }
 
 
-function selectCraterByName(
-    name
-) {
+function selectCraterByName(name) {
 
     const crater =
         craterData.find(
             (c) =>
-                String(
-                    c.name
-                ).toLowerCase() ===
-                String(
-                    name
-                ).toLowerCase()
+                String(c.name).toLowerCase() ===
+                String(name).toLowerCase()
         );
 
 
     if (crater) {
 
-        selectCrater(
-            crater
-        );
+        selectCrater(crater);
     }
 }
 
@@ -1659,9 +1323,7 @@ function selectCraterByName(
    SITE INFORMATION
 ========================================================= */
 
-function updateSiteInformation(
-    crater
-) {
+function updateSiteInformation(crater) {
 
     if (!crater) return;
 
@@ -1693,32 +1355,27 @@ function updateSiteInformation(
         );
 
 
-    siteName.textContent =
-        crater.name ?? "--";
+    if (siteName)
+        siteName.textContent =
+            crater.name ?? "--";
 
+    if (siteLatitude)
+        siteLatitude.textContent =
+            formatCoordinate(lat, "°");
 
-    siteLatitude.textContent =
-        formatCoordinate(
-            lat,
-            "°"
-        );
+    if (siteLongitude)
+        siteLongitude.textContent =
+            formatCoordinate(lon, "°");
 
+    if (siteDiameter)
+        siteDiameter.textContent =
+            diameter === "--"
+                ? "--"
+                : `${diameter} km`;
 
-    siteLongitude.textContent =
-        formatCoordinate(
-            lon,
-            "°"
-        );
-
-
-    siteDiameter.textContent =
-        diameter === "--"
-            ? "--"
-            : `${diameter} km`;
-
-
-    siteRegion.textContent =
-        region;
+    if (siteRegion)
+        siteRegion.textContent =
+            region;
 }
 
 
@@ -1741,13 +1398,9 @@ function formatCoordinate(
         Number(value);
 
 
-    if (
-        Number.isNaN(number)
-    ) {
+    if (Number.isNaN(number)) {
 
-        return String(
-            value
-        );
+        return String(value);
     }
 
 
@@ -1794,24 +1447,14 @@ async function analyzeSelectedSite() {
 
         const url =
             `/api/conditions` +
-            `?latitude=${encodeURIComponent(
-                latitude
-            )}` +
-            `&longitude=${encodeURIComponent(
-                longitude
-            )}` +
-            `&date=${encodeURIComponent(
-                date
-            )}` +
-            `&hour=${encodeURIComponent(
-                hour
-            )}`;
+            `?latitude=${encodeURIComponent(latitude)}` +
+            `&longitude=${encodeURIComponent(longitude)}` +
+            `&date=${encodeURIComponent(date)}` +
+            `&hour=${encodeURIComponent(hour)}`;
 
 
         const response =
-            await fetch(
-                url
-            );
+            await fetch(url);
 
 
         if (!response.ok) {
@@ -1826,18 +1469,11 @@ async function analyzeSelectedSite() {
             await response.json();
 
 
-        updateTelemetry(
-            data
-        );
+        updateTelemetry(data);
 
+        updateAssessment(data);
 
-        updateAssessment(
-            data
-        );
-
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "Analysis failed:",
@@ -1845,8 +1481,11 @@ async function analyzeSelectedSite() {
         );
 
 
-        assessment.textContent =
-            "ANALYSIS ERROR — unable to retrieve mission conditions.";
+        if (assessment) {
+
+            assessment.textContent =
+                "ANALYSIS ERROR — unable to retrieve mission conditions.";
+        }
     }
 }
 
@@ -1855,9 +1494,7 @@ async function analyzeSelectedSite() {
    TELEMETRY
 ========================================================= */
 
-function updateTelemetry(
-    data
-) {
+function updateTelemetry(data) {
 
     if (!data) return;
 
@@ -1865,10 +1502,8 @@ function updateTelemetry(
     const sunData =
         data.sun || {};
 
-
     const earthData =
         data.earth || {};
-
 
     const communication =
         data.communication || {};
@@ -1876,56 +1511,46 @@ function updateTelemetry(
 
     const elevation =
         Number(
-            sunData.elevation_degrees ??
-            0
+            sunData.elevation_degrees ?? 0
         );
 
 
     const power =
         Number(
-            sunData.power_potential_percent ??
-            0
+            sunData.power_potential_percent ?? 0
         );
 
 
     const visibility =
         Number(
-            earthData.visibility_percent ??
-            0
+            earthData.visibility_percent ?? 0
         );
 
 
-    sunElevation.textContent =
-        `${elevation.toFixed(1)}°`;
+    if (sunElevation)
+        sunElevation.textContent =
+            `${elevation.toFixed(1)}°`;
+
+    if (powerPotential)
+        powerPotential.textContent =
+            `${power.toFixed(0)}%`;
+
+    if (earthVisibility)
+        earthVisibility.textContent =
+            `${visibility.toFixed(0)}%`;
+
+    if (communicationStatus)
+        communicationStatus.textContent =
+            communication.status ?? "--";
 
 
-    powerPotential.textContent =
-        `${power.toFixed(0)}%`;
+    if (powerBar)
+        powerBar.style.width =
+            `${clamp(power, 0, 100)}%`;
 
-
-    earthVisibility.textContent =
-        `${visibility.toFixed(0)}%`;
-
-
-    communicationStatus.textContent =
-        communication.status ??
-        "--";
-
-
-    powerBar.style.width =
-        `${clamp(
-            power,
-            0,
-            100
-        )}%`;
-
-
-    earthBar.style.width =
-        `${clamp(
-            visibility,
-            0,
-            100
-        )}%`;
+    if (earthBar)
+        earthBar.style.width =
+            `${clamp(visibility, 0, 100)}%`;
 }
 
 
@@ -1933,13 +1558,12 @@ function updateTelemetry(
    ASSESSMENT
 ========================================================= */
 
-function updateAssessment(
-    data
-) {
+function updateAssessment(data) {
 
     if (
         !data ||
-        !selectedCrater
+        !selectedCrater ||
+        !assessment
     ) {
 
         return;
@@ -1949,16 +1573,14 @@ function updateAssessment(
     const elevation =
         Number(
             data.sun
-                ?.elevation_degrees ??
-            0
+                ?.elevation_degrees ?? 0
         );
 
 
     const power =
         Number(
             data.sun
-                ?.power_potential_percent ??
-            0
+                ?.power_potential_percent ?? 0
         );
 
 
@@ -1976,16 +1598,12 @@ function updateAssessment(
         message +=
             "SUN ABOVE HORIZON. ";
 
-    }
-
-    else if (elevation > 0) {
+    } else if (elevation > 0) {
 
         message +=
             "LOW-SUN ANGLE. ";
 
-    }
-
-    else {
+    } else {
 
         message +=
             "SUN BELOW HORIZON. ";
@@ -1997,16 +1615,12 @@ function updateAssessment(
         message +=
             "Favorable solar-power conditions. ";
 
-    }
-
-    else if (power >= 30) {
+    } else if (power >= 30) {
 
         message +=
             "Moderate solar-power potential. ";
 
-    }
-
-    else {
+    } else {
 
         message +=
             "Limited solar-power potential. ";
@@ -2034,8 +1648,11 @@ function analyzeButtonClicked() {
 
     if (!selectedName) {
 
-        assessment.textContent =
-            "SELECT A LANDING SITE FIRST.";
+        if (assessment) {
+
+            assessment.textContent =
+                "SELECT A LANDING SITE FIRST.";
+        }
 
         return;
     }
@@ -2058,8 +1675,7 @@ async function updateComparison() {
     if (!craterData.length) return;
 
 
-    comparisonGrid.innerHTML =
-        "";
+    comparisonGrid.innerHTML = "";
 
 
     const candidates =
@@ -2074,22 +1690,17 @@ async function updateComparison() {
                             0
                         );
 
-
                     return lat <= -70;
                 }
             )
-            .slice(
-                0,
-                10
-            );
+            .slice(0, 10);
 
 
     for (
         const crater of candidates
     ) {
 
-        let conditions =
-            null;
+        let conditions = null;
 
 
         try {
@@ -2123,9 +1734,7 @@ async function updateComparison() {
 
 
             const response =
-                await fetch(
-                    url
-                );
+                await fetch(url);
 
 
             if (response.ok) {
@@ -2134,9 +1743,7 @@ async function updateComparison() {
                     await response.json();
             }
 
-        }
-
-        catch (error) {
+        } catch (error) {
 
             console.warn(
                 "Comparison error:",
@@ -2163,9 +1770,7 @@ function createComparisonCard(
 ) {
 
     const card =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     card.className =
@@ -2178,9 +1783,7 @@ function createComparisonCard(
             crater.name
     ) {
 
-        card.classList.add(
-            "selected"
-        );
+        card.classList.add("selected");
     }
 
 
@@ -2208,34 +1811,25 @@ function createComparisonCard(
     card.innerHTML = `
 
         <div class="comparison-card-name">
-            ${escapeHTML(
-                crater.name
-            )}
+            ${escapeHTML(crater.name)}
         </div>
 
         <div class="comparison-card-row">
             <span>SUN</span>
-            <strong>
-                ${elevation}°
-            </strong>
+            <strong>${elevation}°</strong>
         </div>
 
         <div class="comparison-card-row">
             <span>SOLAR</span>
-            <strong>
-                ${power}%
-            </strong>
+            <strong>${power}%</strong>
         </div>
 
         <div class="comparison-card-row">
             <span>COMM</span>
             <strong>
-                ${escapeHTML(
-                    communication
-                )}
+                ${escapeHTML(communication)}
             </strong>
         </div>
-
     `;
 
 
@@ -2243,9 +1837,7 @@ function createComparisonCard(
         "click",
         () => {
 
-            selectCrater(
-                crater
-            );
+            selectCrater(crater);
         }
     );
 
@@ -2269,9 +1861,7 @@ async function loadMissionData() {
 
 
     const craterResponse =
-        await fetch(
-            "/api/craters"
-        );
+        await fetch("/api/craters");
 
 
     if (!craterResponse.ok) {
@@ -2286,11 +1876,7 @@ async function loadMissionData() {
         await craterResponse.json();
 
 
-    if (
-        !Array.isArray(
-            craterData
-        )
-    ) {
+    if (!Array.isArray(craterData)) {
 
         throw new Error(
             "Invalid crater database."
@@ -2305,9 +1891,7 @@ async function loadMissionData() {
 
 
     const launchResponse =
-        await fetch(
-            "/api/launch-sites"
-        );
+        await fetch("/api/launch-sites");
 
 
     if (!launchResponse.ok) {
@@ -2322,11 +1906,7 @@ async function loadMissionData() {
         await launchResponse.json();
 
 
-    if (
-        !Array.isArray(
-            launchData
-        )
-    ) {
+    if (!Array.isArray(launchData)) {
 
         throw new Error(
             "Invalid launch site database."
@@ -2366,17 +1946,14 @@ function populateLaunchSites() {
     if (!launchSiteSelect) return;
 
 
-    launchSiteSelect.innerHTML =
-        "";
+    launchSiteSelect.innerHTML = "";
 
 
     launchData.forEach(
         (site) => {
 
             const option =
-                document.createElement(
-                    "option"
-                );
+                document.createElement("option");
 
 
             option.value =
@@ -2400,17 +1977,14 @@ function populateLandingSites() {
     if (!landingSiteSelect) return;
 
 
-    landingSiteSelect.innerHTML =
-        "";
+    landingSiteSelect.innerHTML = "";
 
 
     craterData.forEach(
         (crater) => {
 
             const option =
-                document.createElement(
-                    "option"
-                );
+                document.createElement("option");
 
 
             option.value =
@@ -2591,26 +2165,19 @@ function setupControls() {
    POINTER CAMERA
 ========================================================= */
 
-function handlePointerDown(
-    event
-) {
+function handlePointerDown(event) {
 
-    isDragging =
-        true;
-
+    isDragging = true;
 
     previousMouse.x =
         event.clientX;
-
 
     previousMouse.y =
         event.clientY;
 }
 
 
-function handlePointerMove(
-    event
-) {
+function handlePointerMove(event) {
 
     if (!isDragging) return;
 
@@ -2644,13 +2211,11 @@ function handlePointerMove(
     previousMouse.x =
         event.clientX;
 
-
     previousMouse.y =
         event.clientY;
 
 
     updateCamera();
-
 
     updateCursorCoordinates(
         event
@@ -2660,25 +2225,21 @@ function handlePointerMove(
 
 function handlePointerUp() {
 
-    isDragging =
-        false;
+    isDragging = false;
 }
 
 
 /* =========================================================
-   WHEEL ZOOM
+   ZOOM
 ========================================================= */
 
-function handleWheel(
-    event
-) {
+function handleWheel(event) {
 
     event.preventDefault();
 
 
     cameraDistance +=
-        event.deltaY *
-        0.005;
+        event.deltaY * 0.005;
 
 
     cameraDistance =
@@ -2747,15 +2308,11 @@ function updateCamera() {
 
 function setPolarView() {
 
-    cameraDistance =
-        3.8;
+    cameraDistance = 3.8;
 
-    cameraYaw =
-        0;
+    cameraYaw = 0;
 
-    cameraPitch =
-        -1.15;
-
+    cameraPitch = -1.15;
 
     updateCamera();
 }
@@ -2767,15 +2324,11 @@ function setPolarView() {
 
 function setGlobeView() {
 
-    cameraDistance =
-        7.5;
+    cameraDistance = 7.5;
 
-    cameraYaw =
-        0.65;
+    cameraYaw = 0.65;
 
-    cameraPitch =
-        0.35;
-
+    cameraPitch = 0.35;
 
     updateCamera();
 }
@@ -2787,15 +2340,11 @@ function setGlobeView() {
 
 function resetCamera() {
 
-    cameraDistance =
-        7.5;
+    cameraDistance = 7.5;
 
-    cameraYaw =
-        0.65;
+    cameraYaw = 0.65;
 
-    cameraPitch =
-        0.35;
-
+    cameraPitch = 0.35;
 
     updateCamera();
 }
@@ -2805,9 +2354,7 @@ function resetCamera() {
    CRATER CLICK
 ========================================================= */
 
-function handleSceneClick(
-    event
-) {
+function handleSceneClick(event) {
 
     if (
         !renderer ||
@@ -2831,9 +2378,7 @@ function handleSceneClick(
                 rect.left
             ) /
             rect.width
-        ) *
-            2 -
-        1;
+        ) * 2 - 1;
 
 
     mouse.y =
@@ -2843,9 +2388,7 @@ function handleSceneClick(
                 rect.top
             ) /
             rect.height
-        ) *
-            2 +
-        1;
+        ) * 2 + 1;
 
 
     raycaster.setFromCamera(
@@ -2861,38 +2404,30 @@ function handleSceneClick(
         );
 
 
-    if (
-        !intersections.length
-    ) {
-
+    if (!intersections.length) {
         return;
     }
 
 
-    const object =
-        intersections[0].object;
-
-
     const crater =
-        object.userData.crater;
+        intersections[0]
+            .object
+            .userData
+            .crater;
 
 
     if (crater) {
 
-        selectCrater(
-            crater
-        );
+        selectCrater(crater);
     }
 }
 
 
 /* =========================================================
-   COORDINATES
+   CURSOR COORDINATES
 ========================================================= */
 
-function updateCursorCoordinates(
-    event
-) {
+function updateCursorCoordinates(event) {
 
     if (
         !cursorCoords ||
@@ -2917,9 +2452,7 @@ function updateCursorCoordinates(
                 rect.left
             ) /
             rect.width
-        ) *
-            2 -
-        1;
+        ) * 2 - 1;
 
 
     const y =
@@ -2929,9 +2462,7 @@ function updateCursorCoordinates(
                 rect.top
             ) /
             rect.height
-        ) *
-            2 +
-        1;
+        ) * 2 + 1;
 
 
     const localRay =
@@ -2939,10 +2470,7 @@ function updateCursorCoordinates(
 
 
     localRay.setFromCamera(
-        new THREE.Vector2(
-            x,
-            y
-        ),
+        new THREE.Vector2(x, y),
         camera
     );
 
@@ -2954,9 +2482,7 @@ function updateCursorCoordinates(
         );
 
 
-    if (
-        !intersections.length
-    ) {
+    if (!intersections.length) {
 
         cursorCoords.textContent =
             "LAT -- / LON --";
@@ -2967,13 +2493,12 @@ function updateCursorCoordinates(
 
     const point =
         intersections[0]
-            .point.clone();
+            .point
+            .clone();
 
 
     const local =
-        moon.worldToLocal(
-            point
-        );
+        moon.worldToLocal(point);
 
 
     const radius =
@@ -2983,8 +2508,7 @@ function updateCursorCoordinates(
     const latitude =
         THREE.MathUtils.radToDeg(
             Math.asin(
-                local.y /
-                radius
+                local.y / radius
             )
         );
 
@@ -3004,18 +2528,12 @@ function updateCursorCoordinates(
 
 
 /* =========================================================
-   SPACE LABELS
+   LABELS
 ========================================================= */
 
 function updateSpaceLabels() {
 
-    if (
-        !camera ||
-        !renderer
-    ) {
-
-        return;
-    }
+    if (!camera || !renderer) return;
 
 
     updateLabelPosition(
@@ -3036,50 +2554,38 @@ function updateLabelPosition(
     label
 ) {
 
-    if (
-        !object ||
-        !label
-    ) {
-
-        return;
-    }
+    if (!object || !label) return;
 
 
     const position =
-        object.position.clone();
+        object.getWorldPosition(
+            new THREE.Vector3()
+        );
 
 
-    position.project(
-        camera
-    );
+    position.project(camera);
 
 
     const width =
-        renderer.domElement
-            .clientWidth;
+        renderer.domElement.clientWidth;
 
 
     const height =
-        renderer.domElement
-            .clientHeight;
+        renderer.domElement.clientHeight;
 
 
     const x =
         (
-            position.x *
-            0.5 +
+            position.x * 0.5 +
             0.5
-        ) *
-        width;
+        ) * width;
 
 
     const y =
         (
-            -position.y *
-            0.5 +
+            -position.y * 0.5 +
             0.5
-        ) *
-        height;
+        ) * height;
 
 
     label.style.left =
@@ -3103,20 +2609,13 @@ function updateLabelPosition(
 
 function animate() {
 
-    if (!animationStarted) {
-
-        return;
-    }
+    if (!animationStarted) return;
 
 
     requestAnimationFrame(
         animate
     );
 
-
-    /*
-     * Very slow rotation.
-     */
 
     if (moon) {
 
@@ -3128,14 +2627,14 @@ function animate() {
     if (earth) {
 
         earth.rotation.y +=
-            0.001;
+            0.0004;
     }
 
 
     if (sun) {
 
         sun.rotation.y +=
-            0.0005;
+            0.0003;
     }
 
 
@@ -3184,8 +2683,7 @@ function handleResize() {
 
 
     camera.aspect =
-        width /
-        height;
+        width / height;
 
 
     camera.updateProjectionMatrix();
@@ -3218,15 +2716,10 @@ function clamp(
 }
 
 
-function formatTime(
-    hour
-) {
+function formatTime(hour) {
 
     const h =
-        Math.floor(
-            hour
-        );
-
+        Math.floor(hour);
 
     return `${String(h).padStart(2, "0")}:00`;
 }
@@ -3252,29 +2745,12 @@ function updateLoading(
 }
 
 
-function escapeHTML(
-    value
-) {
+function escapeHTML(value) {
 
     return String(value)
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
