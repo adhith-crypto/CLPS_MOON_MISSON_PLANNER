@@ -12,9 +12,10 @@ let renderer;
 let moon;
 let earth;
 let sun;
+let atmosphere;
 
 let craterGroup;
-let atmosphere;
+let earthOrbitGroup;
 
 let craterData = [];
 let launchData = [];
@@ -27,7 +28,11 @@ let cameraYaw = 0.65;
 let cameraPitch = 0.35;
 
 let isDragging = false;
-let previousMouse = { x: 0, y: 0 };
+
+let previousMouse = {
+    x: 0,
+    y: 0
+};
 
 let raycaster;
 let mouse;
@@ -36,147 +41,212 @@ let animationStarted = false;
 
 
 /* =========================================================
-   DOM HELPERS
+   DOM
 ========================================================= */
 
-const $ = (id) => document.getElementById(id);
+const $ = (id) =>
+    document.getElementById(id);
 
-const launchSiteSelect = $("launchSite");
-const landingSiteSelect = $("landingSite");
-const missionDate = $("missionDate");
-const lunarHour = $("lunarHour");
-const lunarHourValue = $("lunarHourValue");
+const launchSiteSelect =
+    $("launchSite");
 
-const analyzeButton = $("analyzeButton");
-const resetButton = $("resetButton");
+const landingSiteSelect =
+    $("landingSite");
 
-const southPoleOnly = $("southPoleOnly");
-const majorOnly = $("majorOnly");
+const missionDate =
+    $("missionDate");
 
-const zoomIn = $("zoomIn");
-const zoomOut = $("zoomOut");
+const lunarHour =
+    $("lunarHour");
 
-const viewTop = $("viewTop");
-const viewGlobe = $("viewGlobe");
+const lunarHourValue =
+    $("lunarHourValue");
 
-const sunElevation = $("sunElevation");
-const powerPotential = $("powerPotential");
-const earthVisibility = $("earthVisibility");
-const communicationStatus = $("communicationStatus");
+const analyzeButton =
+    $("analyzeButton");
 
-const powerBar = $("powerBar");
-const earthBar = $("earthBar");
+const resetButton =
+    $("resetButton");
 
-const siteName = $("siteName");
-const siteLatitude = $("siteLatitude");
-const siteLongitude = $("siteLongitude");
-const siteDiameter = $("siteDiameter");
-const siteRegion = $("siteRegion");
+const southPoleOnly =
+    $("southPoleOnly");
 
-const assessment = $("assessment");
+const majorOnly =
+    $("majorOnly");
 
-const comparisonGrid = $("comparisonGrid");
+const zoomIn =
+    $("zoomIn");
 
-const cameraDistanceDisplay = $("cameraDistance");
+const zoomOut =
+    $("zoomOut");
 
-const cursorCoords = $("cursorCoords");
+const viewTop =
+    $("viewTop");
 
-const sunLabel = $("sun-label");
-const earthLabel = $("earth-label");
+const viewGlobe =
+    $("viewGlobe");
 
-const loadingOverlay = $("loading-overlay");
-const loadingProgress = $("loadingProgress");
-const loadingText = $("loadingText");
+const sunElevation =
+    $("sunElevation");
+
+const powerPotential =
+    $("powerPotential");
+
+const earthVisibility =
+    $("earthVisibility");
+
+const communicationStatus =
+    $("communicationStatus");
+
+const powerBar =
+    $("powerBar");
+
+const earthBar =
+    $("earthBar");
+
+const siteName =
+    $("siteName");
+
+const siteLatitude =
+    $("siteLatitude");
+
+const siteLongitude =
+    $("siteLongitude");
+
+const siteDiameter =
+    $("siteDiameter");
+
+const siteRegion =
+    $("siteRegion");
+
+const assessment =
+    $("assessment");
+
+const comparisonGrid =
+    $("comparisonGrid");
+
+const cameraDistanceDisplay =
+    $("cameraDistance");
+
+const cursorCoords =
+    $("cursorCoords");
+
+const sunLabel =
+    $("sun-label");
+
+const earthLabel =
+    $("earth-label");
+
+const loadingOverlay =
+    $("loading-overlay");
+
+const loadingProgress =
+    $("loadingProgress");
+
+const loadingText =
+    $("loadingText");
 
 
 /* =========================================================
    STARTUP
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
 
-    try {
+        try {
 
-        if (!THREE) {
-            throw new Error(
-                "Three.js failed to load."
-            );
-        }
+            if (!THREE) {
 
-        setDefaultDate();
-
-        initializeThree();
-
-        setupControls();
-
-        updateLoading(
-            15,
-            "Initializing 3D environment..."
-        );
-
-        await loadMissionData();
-
-        updateLoading(
-            100,
-            "Mission environment ready."
-        );
-
-        setTimeout(() => {
-
-            if (loadingOverlay) {
-
-                loadingOverlay.style.opacity = "0";
-
-                setTimeout(() => {
-
-                    loadingOverlay.style.display =
-                        "none";
-
-                }, 500);
+                throw new Error(
+                    "Three.js failed to load."
+                );
             }
 
-        }, 400);
+            setDefaultDate();
 
+            initializeThree();
 
-        if (
-            landingSiteSelect &&
-            landingSiteSelect.options.length > 0
-        ) {
+            setupControls();
 
-            landingSiteSelect.selectedIndex = 0;
-
-            selectCraterByName(
-                landingSiteSelect.value
+            updateLoading(
+                15,
+                "Initializing 3D environment..."
             );
+
+            await loadMissionData();
+
+            updateLoading(
+                100,
+                "Mission environment ready."
+            );
+
+            setTimeout(
+                () => {
+
+                    if (loadingOverlay) {
+
+                        loadingOverlay.style.opacity =
+                            "0";
+
+                        setTimeout(
+                            () => {
+
+                                loadingOverlay.style.display =
+                                    "none";
+
+                            },
+                            500
+                        );
+                    }
+
+                },
+                400
+            );
+
+            if (
+                landingSiteSelect &&
+                landingSiteSelect.options.length
+            ) {
+
+                landingSiteSelect.selectedIndex =
+                    0;
+
+                selectCraterByName(
+                    landingSiteSelect.value
+                );
+            }
+
+            animationStarted =
+                true;
+
+            animate();
+
         }
 
+        catch (error) {
 
-        animationStarted = true;
+            console.error(
+                "STARTUP ERROR:",
+                error
+            );
 
-        animate();
-
+            showLoadingError(
+                error.message
+            );
+        }
     }
-
-    catch (error) {
-
-        console.error(
-            "STARTUP ERROR:",
-            error
-        );
-
-        showLoadingError(
-            error.message
-        );
-    }
-
-});
+);
 
 
 /* =========================================================
    LOADING ERROR
 ========================================================= */
 
-function showLoadingError(message) {
+function showLoadingError(
+    message
+) {
 
     if (loadingText) {
 
@@ -192,8 +262,11 @@ function showLoadingError(message) {
 
     if (loadingOverlay) {
 
-        loadingOverlay.style.opacity = "1";
-        loadingOverlay.style.display = "flex";
+        loadingOverlay.style.opacity =
+            "1";
+
+        loadingOverlay.style.display =
+            "flex";
     }
 }
 
@@ -206,7 +279,8 @@ function setDefaultDate() {
 
     if (!missionDate) return;
 
-    const now = new Date();
+    const now =
+        new Date();
 
     const year =
         now.getFullYear();
@@ -214,12 +288,18 @@ function setDefaultDate() {
     const month =
         String(
             now.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
     const day =
         String(
             now.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
     missionDate.value =
         `${year}-${month}-${day}`;
@@ -227,7 +307,7 @@ function setDefaultDate() {
 
 
 /* =========================================================
-   THREE.JS INITIALIZATION
+   THREE INITIALIZATION
 ========================================================= */
 
 function initializeThree() {
@@ -241,7 +321,6 @@ function initializeThree() {
             "3D container not found."
         );
     }
-
 
     scene =
         new THREE.Scene();
@@ -268,9 +347,9 @@ function initializeThree() {
 
 
     camera.position.set(
-        4.7,
+        5,
         3.2,
-        5.8
+        6
     );
 
 
@@ -316,7 +395,7 @@ function initializeThree() {
     );
 
 
-    /* LIGHTING */
+    /* LIGHT */
 
     const ambientLight =
         new THREE.AmbientLight(
@@ -348,10 +427,13 @@ function initializeThree() {
     sunlight.castShadow =
         true;
 
+
     scene.add(
         sunlight
     );
 
+
+    /* SPACE */
 
     createStars();
 
@@ -359,8 +441,12 @@ function initializeThree() {
 
     createEarth();
 
+    createEarthOrbitLines();
+
     createSun();
 
+
+    /* RAYCASTING */
 
     raycaster =
         new THREE.Raycaster();
@@ -368,6 +454,8 @@ function initializeThree() {
     mouse =
         new THREE.Vector2();
 
+
+    /* EVENTS */
 
     window.addEventListener(
         "resize",
@@ -402,7 +490,9 @@ function initializeThree() {
     renderer.domElement.addEventListener(
         "wheel",
         handleWheel,
-        { passive: false }
+        {
+            passive: false
+        }
     );
 
 
@@ -445,7 +535,9 @@ function createStars() {
 
         const phi =
             Math.acos(
-                2 * Math.random() - 1
+                2 *
+                Math.random() -
+                1
             );
 
 
@@ -512,12 +604,17 @@ function createMoonTexture() {
         );
 
 
-    canvas.width = 1024;
-    canvas.height = 512;
+    canvas.width =
+        1024;
+
+    canvas.height =
+        512;
 
 
     const ctx =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
 
 
     ctx.fillStyle =
@@ -532,7 +629,7 @@ function createMoonTexture() {
     );
 
 
-    /* SURFACE NOISE */
+    /* SURFACE */
 
     for (
         let i = 0;
@@ -554,11 +651,7 @@ function createMoonTexture() {
 
 
         ctx.fillStyle =
-            `rgb(
-                ${brightness},
-                ${brightness},
-                ${brightness - 3}
-            )`;
+            `rgb(${brightness},${brightness},${brightness - 3})`;
 
 
         ctx.fillRect(
@@ -588,7 +681,8 @@ function createMoonTexture() {
 
         const radius =
             3 +
-            Math.random() * 30;
+            Math.random() *
+            30;
 
 
         const gradient =
@@ -648,15 +742,26 @@ function createMoonTexture() {
 
 /* =========================================================
    MOON
+   SMALLER THAN EARTH
 ========================================================= */
 
 function createMoon() {
 
+    /*
+     * EARTH:
+     * 0.95 radius
+     *
+     * MOON:
+     * 0.42 radius
+     *
+     * This makes Earth clearly larger.
+     */
+
     const geometry =
         new THREE.SphereGeometry(
-            2.25,
-            96,
-            64
+            0.42,
+            64,
+            48
         );
 
 
@@ -675,7 +780,8 @@ function createMoon() {
 
             bumpMap: texture,
 
-            bumpScale: 0.055
+            bumpScale: 0.035
+
         });
 
 
@@ -684,6 +790,18 @@ function createMoon() {
             geometry,
             material
         );
+
+
+    /*
+     * Keep Moon as the main
+     * mission object.
+     */
+
+    moon.position.set(
+        0,
+        0,
+        0
+    );
 
 
     moon.rotation.y =
@@ -703,17 +821,11 @@ function createMoon() {
     );
 
 
-    /* CRATER GROUP */
+    /* CRATERS */
 
     craterGroup =
         new THREE.Group();
 
-
-    /*
-     * IMPORTANT:
-     * Markers belong to the Moon,
-     * so they rotate with it.
-     */
 
     moon.add(
         craterGroup
@@ -723,13 +835,19 @@ function createMoon() {
 
 /* =========================================================
    EARTH
+   BIGGER + FARTHER AWAY
 ========================================================= */
 
 function createEarth() {
 
+    /*
+     * Earth is intentionally
+     * larger than the Moon.
+     */
+
     const geometry =
         new THREE.SphereGeometry(
-            0.62,
+            0.95,
             64,
             48
         );
@@ -741,18 +859,23 @@ function createEarth() {
         );
 
 
-    canvas.width = 512;
-    canvas.height = 256;
+    canvas.width =
+        1024;
+
+    canvas.height =
+        512;
 
 
     const ctx =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
 
 
     /* OCEAN */
 
     ctx.fillStyle =
-        "#163e63";
+        "#16466d";
 
 
     ctx.fillRect(
@@ -767,14 +890,14 @@ function createEarth() {
 
     for (
         let i = 0;
-        i < 45;
+        i < 65;
         i++
     ) {
 
         ctx.fillStyle =
             i % 2 === 0
                 ? "#4e7049"
-                : "#657d52";
+                : "#637e52";
 
 
         const x =
@@ -786,12 +909,14 @@ function createEarth() {
             canvas.height;
 
         const w =
-            15 +
-            Math.random() * 80;
+            20 +
+            Math.random() *
+            120;
 
         const h =
-            8 +
-            Math.random() * 35;
+            10 +
+            Math.random() *
+            55;
 
 
         ctx.beginPath();
@@ -816,12 +941,12 @@ function createEarth() {
 
     for (
         let i = 0;
-        i < 55;
+        i < 70;
         i++
     ) {
 
         ctx.fillStyle =
-            "rgba(240,245,245,0.3)";
+            "rgba(240,245,245,0.32)";
 
 
         const x =
@@ -839,10 +964,10 @@ function createEarth() {
         ctx.ellipse(
             x,
             y,
-            10 +
-                Math.random() * 35,
-            2 +
-                Math.random() * 6,
+            15 +
+                Math.random() * 45,
+            3 +
+                Math.random() * 8,
             0,
             0,
             Math.PI * 2
@@ -861,9 +986,13 @@ function createEarth() {
 
     const material =
         new THREE.MeshStandardMaterial({
+
             map: texture,
-            roughness: 0.65,
+
+            roughness: 0.62,
+
             metalness: 0
+
         });
 
 
@@ -874,11 +1003,23 @@ function createEarth() {
         );
 
 
+    /*
+     * FARTHER FROM THE MOON
+     */
+
     earth.position.set(
-        -5.5,
-        2.7,
-        -2.5
+        -7.5,
+        3.5,
+        -4.5
     );
+
+
+    earth.castShadow =
+        true;
+
+
+    earth.receiveShadow =
+        true;
 
 
     scene.add(
@@ -890,7 +1031,7 @@ function createEarth() {
 
     const atmosphereGeometry =
         new THREE.SphereGeometry(
-            0.68,
+            1.04,
             48,
             32
         );
@@ -898,10 +1039,15 @@ function createEarth() {
 
     const atmosphereMaterial =
         new THREE.MeshBasicMaterial({
+
             color: 0x4d9bd4,
+
             transparent: true,
-            opacity: 0.12,
+
+            opacity: 0.13,
+
             side: THREE.BackSide
+
         });
 
 
@@ -914,6 +1060,142 @@ function createEarth() {
 
     earth.add(
         atmosphere
+    );
+}
+
+
+/* =========================================================
+   EARTH ORBIT / TRAJECTORY LINES
+========================================================= */
+
+function createEarthOrbitLines() {
+
+    earthOrbitGroup =
+        new THREE.Group();
+
+
+    /*
+     * Orbit center is Earth.
+     */
+
+    const orbitRadii = [
+        1.55,
+        1.95,
+        2.35
+    ];
+
+
+    orbitRadii.forEach(
+        (radius, index) => {
+
+            const points = [];
+
+            const segments = 160;
+
+
+            for (
+                let i = 0;
+                i <= segments;
+                i++
+            ) {
+
+                const angle =
+                    (
+                        i /
+                        segments
+                    ) *
+                    Math.PI *
+                    2;
+
+
+                const x =
+                    Math.cos(angle) *
+                    radius;
+
+
+                const z =
+                    Math.sin(angle) *
+                    radius;
+
+
+                /*
+                 * Slight inclination
+                 * gives the orbital
+                 * trajectory a 3D look.
+                 */
+
+                const y =
+                    Math.sin(angle * 2) *
+                    (
+                        0.12 +
+                        index * 0.035
+                    );
+
+
+                points.push(
+                    new THREE.Vector3(
+                        x,
+                        y,
+                        z
+                    )
+                );
+            }
+
+
+            const geometry =
+                new THREE.BufferGeometry()
+                    .setFromPoints(
+                        points
+                    );
+
+
+            const material =
+                new THREE.LineBasicMaterial({
+
+                    color:
+                        index === 0
+                            ? 0x9fb38b
+                            : 0x64735c,
+
+                    transparent: true,
+
+                    opacity:
+                        index === 0
+                            ? 0.8
+                            : 0.45
+
+                });
+
+
+            const orbit =
+                new THREE.LineLoop(
+                    geometry,
+                    material
+                );
+
+
+            /*
+             * Parent the trajectory
+             * to Earth so it stays
+             * centered on Earth.
+             */
+
+            orbit.position.set(
+                0,
+                0,
+                0
+            );
+
+
+            earthOrbitGroup.add(
+                orbit
+            );
+        }
+    );
+
+
+    earth.add(
+        earthOrbitGroup
     );
 }
 
@@ -969,10 +1251,15 @@ function createSun() {
 
     const glowMaterial =
         new THREE.MeshBasicMaterial({
+
             color: 0xffb83e,
+
             transparent: true,
+
             opacity: 0.13,
+
             side: THREE.BackSide
+
         });
 
 
@@ -990,7 +1277,7 @@ function createSun() {
 
 
 /* =========================================================
-   LAT/LON → 3D
+   LAT/LON → VECTOR
 ========================================================= */
 
 function latitudeLongitudeToVector(
@@ -1003,6 +1290,7 @@ function latitudeLongitudeToVector(
         THREE.MathUtils.degToRad(
             latitude
         );
+
 
     const lon =
         THREE.MathUtils.degToRad(
@@ -1088,17 +1376,15 @@ function createCraterMarkers() {
                 latitudeLongitudeToVector(
                     latitude,
                     longitude,
-                    2.30
+                    0.435
                 );
 
-
-            /* MARKER */
 
             const markerGeometry =
                 new THREE.SphereGeometry(
                     isSouthPole
-                        ? 0.065
-                        : 0.045,
+                        ? 0.018
+                        : 0.014,
                     16,
                     12
                 );
@@ -1106,10 +1392,12 @@ function createCraterMarkers() {
 
             const markerMaterial =
                 new THREE.MeshBasicMaterial({
+
                     color:
                         isSouthPole
                             ? 0xaacb7b
                             : 0xd6d6d6
+
                 });
 
 
@@ -1147,24 +1435,30 @@ function createCraterMarkers() {
             );
 
 
-            /* RING */
+            /* SOUTH POLE RING */
 
             if (isSouthPole) {
 
                 const ringGeometry =
                     new THREE.RingGeometry(
-                        0.085,
-                        0.11,
+                        0.025,
+                        0.035,
                         24
                     );
 
 
                 const ringMaterial =
                     new THREE.MeshBasicMaterial({
+
                         color: 0x829a69,
+
                         transparent: true,
+
                         opacity: 0.7,
-                        side: THREE.DoubleSide
+
+                        side:
+                            THREE.DoubleSide
+
                     });
 
 
@@ -1214,7 +1508,6 @@ function createCraterMarkers() {
                     ring
                 );
             }
-
         }
     );
 
@@ -1239,7 +1532,8 @@ function updateCraterVisibility() {
                 mesh.userData.isMajor;
 
 
-            let visible = false;
+            let visible =
+                false;
 
 
             /*
@@ -1252,7 +1546,8 @@ function updateCraterVisibility() {
                 southPoleOnly.checked
             ) {
 
-                visible = true;
+                visible =
+                    true;
             }
 
 
@@ -1261,7 +1556,8 @@ function updateCraterVisibility() {
                 majorOnly.checked
             ) {
 
-                visible = true;
+                visible =
+                    true;
             }
 
 
@@ -1309,7 +1605,9 @@ function selectCrater(
                     2.5
                 );
 
-            } else {
+            }
+
+            else {
 
                 mesh.scale.set(
                     1,
@@ -1339,10 +1637,12 @@ function selectCraterByName(
     const crater =
         craterData.find(
             (c) =>
-                String(c.name)
-                    .toLowerCase() ===
-                String(name)
-                    .toLowerCase()
+                String(
+                    c.name
+                ).toLowerCase() ===
+                String(
+                    name
+                ).toLowerCase()
         );
 
 
@@ -1445,7 +1745,9 @@ function formatCoordinate(
         Number.isNaN(number)
     ) {
 
-        return String(value);
+        return String(
+            value
+        );
     }
 
 
@@ -1492,14 +1794,24 @@ async function analyzeSelectedSite() {
 
         const url =
             `/api/conditions` +
-            `?latitude=${encodeURIComponent(latitude)}` +
-            `&longitude=${encodeURIComponent(longitude)}` +
-            `&date=${encodeURIComponent(date)}` +
-            `&hour=${encodeURIComponent(hour)}`;
+            `?latitude=${encodeURIComponent(
+                latitude
+            )}` +
+            `&longitude=${encodeURIComponent(
+                longitude
+            )}` +
+            `&date=${encodeURIComponent(
+                date
+            )}` +
+            `&hour=${encodeURIComponent(
+                hour
+            )}`;
 
 
         const response =
-            await fetch(url);
+            await fetch(
+                url
+            );
 
 
         if (!response.ok) {
@@ -1811,7 +2123,9 @@ async function updateComparison() {
 
 
             const response =
-                await fetch(url);
+                await fetch(
+                    url
+                );
 
 
             if (response.ok) {
@@ -1948,113 +2262,98 @@ function createComparisonCard(
 
 async function loadMissionData() {
 
-    try {
+    updateLoading(
+        30,
+        "Loading lunar crater database..."
+    );
 
-        updateLoading(
-            30,
-            "Loading lunar crater database..."
+
+    const craterResponse =
+        await fetch(
+            "/api/craters"
         );
 
 
-        const craterResponse =
-            await fetch(
-                "/api/craters"
-            );
+    if (!craterResponse.ok) {
 
-
-        if (!craterResponse.ok) {
-
-            throw new Error(
-                "Could not load craters."
-            );
-        }
-
-
-        craterData =
-            await craterResponse.json();
-
-
-        if (
-            !Array.isArray(
-                craterData
-            )
-        ) {
-
-            throw new Error(
-                "Crater database returned invalid data."
-            );
-        }
-
-
-        updateLoading(
-            55,
-            "Loading Earth launch sites..."
+        throw new Error(
+            "Could not load craters."
         );
-
-
-        const launchResponse =
-            await fetch(
-                "/api/launch-sites"
-            );
-
-
-        if (!launchResponse.ok) {
-
-            throw new Error(
-                "Could not load launch sites."
-            );
-        }
-
-
-        launchData =
-            await launchResponse.json();
-
-
-        if (
-            !Array.isArray(
-                launchData
-            )
-        ) {
-
-            throw new Error(
-                "Launch site database returned invalid data."
-            );
-        }
-
-
-        populateLaunchSites();
-
-        populateLandingSites();
-
-        createCraterMarkers();
-
-
-        updateLoading(
-            80,
-            "Preparing mission telemetry..."
-        );
-
-
-        await updateComparison();
-
-
-        updateLoading(
-            95,
-            "Finalizing mission interface..."
-        );
-
     }
 
-    catch (error) {
 
-        console.error(
-            "Mission data loading failed:",
-            error
+    craterData =
+        await craterResponse.json();
+
+
+    if (
+        !Array.isArray(
+            craterData
+        )
+    ) {
+
+        throw new Error(
+            "Invalid crater database."
+        );
+    }
+
+
+    updateLoading(
+        55,
+        "Loading Earth launch sites..."
+    );
+
+
+    const launchResponse =
+        await fetch(
+            "/api/launch-sites"
         );
 
 
-        throw error;
+    if (!launchResponse.ok) {
+
+        throw new Error(
+            "Could not load launch sites."
+        );
     }
+
+
+    launchData =
+        await launchResponse.json();
+
+
+    if (
+        !Array.isArray(
+            launchData
+        )
+    ) {
+
+        throw new Error(
+            "Invalid launch site database."
+        );
+    }
+
+
+    populateLaunchSites();
+
+    populateLandingSites();
+
+    createCraterMarkers();
+
+
+    updateLoading(
+        80,
+        "Preparing mission telemetry..."
+    );
+
+
+    await updateComparison();
+
+
+    updateLoading(
+        95,
+        "Finalizing mission interface..."
+    );
 }
 
 
@@ -2136,8 +2435,6 @@ function populateLandingSites() {
 
 function setupControls() {
 
-    /* ANALYZE */
-
     if (analyzeButton) {
 
         analyzeButton.addEventListener(
@@ -2146,8 +2443,6 @@ function setupControls() {
         );
     }
 
-
-    /* SITE DROPDOWN */
 
     if (landingSiteSelect) {
 
@@ -2158,13 +2453,10 @@ function setupControls() {
                 selectCraterByName(
                     landingSiteSelect.value
                 );
-
             }
         );
     }
 
-
-    /* DATE */
 
     if (missionDate) {
 
@@ -2178,13 +2470,10 @@ function setupControls() {
 
                     updateComparison();
                 }
-
             }
         );
     }
 
-
-    /* TIME */
 
     if (lunarHour) {
 
@@ -2211,13 +2500,10 @@ function setupControls() {
 
                     updateComparison();
                 }
-
             }
         );
     }
 
-
-    /* FILTERS */
 
     if (southPoleOnly) {
 
@@ -2237,8 +2523,6 @@ function setupControls() {
     }
 
 
-    /* RESET */
-
     if (resetButton) {
 
         resetButton.addEventListener(
@@ -2248,8 +2532,6 @@ function setupControls() {
     }
 
 
-    /* ZOOM IN */
-
     if (zoomIn) {
 
         zoomIn.addEventListener(
@@ -2258,18 +2540,15 @@ function setupControls() {
 
                 cameraDistance =
                     Math.max(
-                        3.3,
+                        2.5,
                         cameraDistance - 0.8
                     );
-
 
                 updateCamera();
             }
         );
     }
 
-
-    /* ZOOM OUT */
 
     if (zoomOut) {
 
@@ -2279,18 +2558,15 @@ function setupControls() {
 
                 cameraDistance =
                     Math.min(
-                        16,
+                        18,
                         cameraDistance + 0.8
                     );
-
 
                 updateCamera();
             }
         );
     }
 
-
-    /* POLAR */
 
     if (viewTop) {
 
@@ -2300,8 +2576,6 @@ function setupControls() {
         );
     }
 
-
-    /* GLOBE */
 
     if (viewGlobe) {
 
@@ -2314,17 +2588,20 @@ function setupControls() {
 
 
 /* =========================================================
-   CAMERA DRAG
+   POINTER CAMERA
 ========================================================= */
 
 function handlePointerDown(
     event
 ) {
 
-    isDragging = true;
+    isDragging =
+        true;
+
 
     previousMouse.x =
         event.clientX;
+
 
     previousMouse.y =
         event.clientY;
@@ -2374,6 +2651,7 @@ function handlePointerMove(
 
     updateCamera();
 
+
     updateCursorCoordinates(
         event
     );
@@ -2388,7 +2666,7 @@ function handlePointerUp() {
 
 
 /* =========================================================
-   ZOOM
+   WHEEL ZOOM
 ========================================================= */
 
 function handleWheel(
@@ -2399,14 +2677,15 @@ function handleWheel(
 
 
     cameraDistance +=
-        event.deltaY * 0.005;
+        event.deltaY *
+        0.005;
 
 
     cameraDistance =
         clamp(
             cameraDistance,
-            3.3,
-            16
+            2.5,
+            18
         );
 
 
@@ -2463,13 +2742,13 @@ function updateCamera() {
 
 
 /* =========================================================
-   CAMERA VIEWS
+   POLAR VIEW
 ========================================================= */
 
 function setPolarView() {
 
     cameraDistance =
-        6.3;
+        3.8;
 
     cameraYaw =
         0;
@@ -2481,6 +2760,10 @@ function setPolarView() {
     updateCamera();
 }
 
+
+/* =========================================================
+   GLOBE VIEW
+========================================================= */
 
 function setGlobeView() {
 
@@ -2497,6 +2780,10 @@ function setGlobeView() {
     updateCamera();
 }
 
+
+/* =========================================================
+   RESET
+========================================================= */
 
 function resetCamera() {
 
@@ -2515,7 +2802,7 @@ function resetCamera() {
 
 
 /* =========================================================
-   CLICK CRATERS
+   CRATER CLICK
 ========================================================= */
 
 function handleSceneClick(
@@ -2539,8 +2826,10 @@ function handleSceneClick(
 
     mouse.x =
         (
-            (event.clientX -
-                rect.left) /
+            (
+                event.clientX -
+                rect.left
+            ) /
             rect.width
         ) *
             2 -
@@ -2598,7 +2887,7 @@ function handleSceneClick(
 
 
 /* =========================================================
-   CURSOR COORDINATES
+   COORDINATES
 ========================================================= */
 
 function updateCursorCoordinates(
@@ -2623,8 +2912,10 @@ function updateCursorCoordinates(
 
     const x =
         (
-            (event.clientX -
-                rect.left) /
+            (
+                event.clientX -
+                rect.left
+            ) /
             rect.width
         ) *
             2 -
@@ -2813,6 +3104,7 @@ function updateLabelPosition(
 function animate() {
 
     if (!animationStarted) {
+
         return;
     }
 
@@ -2823,9 +3115,7 @@ function animate() {
 
 
     /*
-     * Slow rotation.
-     * Crater markers are attached
-     * to the Moon and rotate with it.
+     * Very slow rotation.
      */
 
     if (moon) {
