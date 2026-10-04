@@ -13,11 +13,9 @@
     >
 </head>
 
-
 <body>
 
 <div id="app">
-
 
     <!-- =========================================
          TOP MISSION BAR
@@ -37,7 +35,6 @@
 
         </div>
 
-
         <div class="mission-status">
 
             <span class="status-light"></span>
@@ -49,7 +46,6 @@
         </div>
 
     </header>
-
 
 
     <!-- =========================================
@@ -115,7 +111,6 @@
                     LUNAR LOCAL TIME
                 </label>
 
-
                 <div class="slider-row">
 
                     <input
@@ -157,7 +152,9 @@
             <div class="panel-divider"></div>
 
 
-            <!-- VISUALIZATION -->
+            <!-- =================================
+                 VISUALIZATION
+            ================================== -->
 
             <div class="panel-heading">
                 VISUALIZATION
@@ -232,7 +229,9 @@
             <div class="panel-divider"></div>
 
 
-            <!-- CAMERA HELP -->
+            <!-- =================================
+                 CAMERA HELP
+            ================================== -->
 
             <div class="panel-heading">
                 CAMERA
@@ -263,18 +262,13 @@
         </aside>
 
 
-
         <!-- =====================================
              3D VIEWPORT
         ====================================== -->
 
         <section id="viewport">
 
-
-            <!-- THREE.JS GOES HERE -->
-
             <div id="three-container"></div>
-
 
 
             <!-- VIEW HEADER -->
@@ -294,7 +288,6 @@
                 </div>
 
             </div>
-
 
 
             <!-- CENTER RETICLE -->
@@ -320,7 +313,6 @@
             </div>
 
 
-
             <!-- SPACE OBJECT LABELS -->
 
             <div id="scene-labels">
@@ -329,7 +321,7 @@
                     id="sun-label"
                     class="space-label"
                 >
-                    ☀ SUN
+                    SUN
                 </div>
 
 
@@ -343,13 +335,12 @@
             </div>
 
 
-
             <!-- CAMERA READOUT -->
 
             <div id="camera-readout">
 
                 <div>
-                    CAMERA
+                    CAMERA RANGE
                 </div>
 
                 <strong id="cameraDistance">
@@ -357,7 +348,6 @@
                 </strong>
 
             </div>
-
 
 
             <!-- COORDINATE READOUT -->
@@ -369,7 +359,6 @@
                 </span>
 
             </div>
-
 
 
             <!-- LOADING SCREEN -->
@@ -403,7 +392,6 @@
         </section>
 
 
-
         <!-- =====================================
              RIGHT TELEMETRY PANEL
         ====================================== -->
@@ -413,11 +401,9 @@
             class="hud-panel"
         >
 
-
             <div class="panel-heading">
                 MISSION TELEMETRY
             </div>
-
 
 
             <!-- SUN -->
@@ -427,7 +413,6 @@
                 <div class="telemetry-label">
                     SUN ELEVATION
                 </div>
-
 
                 <div
                     class="telemetry-value"
@@ -439,7 +424,6 @@
             </div>
 
 
-
             <!-- SOLAR POWER -->
 
             <div class="telemetry-block">
@@ -448,14 +432,12 @@
                     SOLAR POWER POTENTIAL
                 </div>
 
-
                 <div
                     class="telemetry-value"
                     id="powerPotential"
                 >
                     --%
                 </div>
-
 
                 <div class="telemetry-bar">
 
@@ -468,7 +450,6 @@
             </div>
 
 
-
             <!-- EARTH VISIBILITY -->
 
             <div class="telemetry-block">
@@ -477,14 +458,12 @@
                     EARTH VISIBILITY
                 </div>
 
-
                 <div
                     class="telemetry-value"
                     id="earthVisibility"
                 >
                     --%
                 </div>
-
 
                 <div class="telemetry-bar">
 
@@ -497,7 +476,6 @@
             </div>
 
 
-
             <!-- COMMUNICATION -->
 
             <div class="telemetry-block">
@@ -505,7 +483,6 @@
                 <div class="telemetry-label">
                     DIRECT-TO-EARTH
                 </div>
-
 
                 <div
                     class="communication-value"
@@ -517,12 +494,12 @@
             </div>
 
 
-
             <div class="panel-divider"></div>
 
 
-
-            <!-- SELECTED SITE -->
+            <!-- =================================
+                 SELECTED SITE
+            ================================== -->
 
             <div class="panel-heading">
                 SELECTED SITE
@@ -530,7 +507,6 @@
 
 
             <div class="site-data">
-
 
                 <div class="data-row">
 
@@ -596,16 +572,15 @@
 
                 </div>
 
-
             </div>
-
 
 
             <div class="panel-divider"></div>
 
 
-
-            <!-- ASSESSMENT -->
+            <!-- =================================
+                 ASSESSMENT
+            ================================== -->
 
             <div class="panel-heading">
                 MISSION ASSESSMENT
@@ -619,12 +594,9 @@
                 Select a landing site.
             </div>
 
-
         </aside>
 
-
     </main>
-
 
 
     <!-- =========================================
@@ -632,7 +604,6 @@
     ========================================== -->
 
     <section id="comparison-panel">
-
 
         <div class="comparison-title">
 
@@ -656,22 +627,22 @@
             class="comparison-grid"
         ></div>
 
-
     </section>
-
 
 </div>
 
 
-
 <!-- =========================================
      THREE.JS
+     
+     IMPORTANT:
+     Use the non-module build because app.js
+     accesses THREE through window.THREE.
 ========================================== -->
 
 <script
-    src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"
+    src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"
 ></script>
-
 
 
 <!-- =========================================
@@ -684,5 +655,4 @@
 
 
 </body>
-
 </html>
