@@ -13,12 +13,10 @@
     >
 </head>
 
-
 <body>
 
 <div id="app">
 
-Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.WritePreviewHeadingBold(control b) control⌃ bBItalic(control i) control⌃ iIQuote(control shift right angle bracket) control⌃ shift⇧ right angle bracket>Code(control e) control⌃ eELink(control k) control⌃ kKUnordered list(control 8) control⌃ 88Numbered list(control shift ampersand) control⌃ shift⇧ ampersand&Task list(control shift l) control⌃ shift⇧ lLMentionReferenceMore itemsSaved repliesAdd FilesPaste, drop, or click to add filesCancelComment
     <!-- =========================================
          TOP MISSION BAR
     ========================================== -->
@@ -37,7 +35,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
 
         </div>
 
-
         <div class="mission-status">
 
             <span class="status-light"></span>
@@ -51,13 +48,11 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
     </header>
 
 
-
     <!-- =========================================
          MAIN MISSION SCREEN
     ========================================== -->
 
     <main id="mission-screen">
-
 
         <!-- =====================================
              LEFT CONTROL PANEL
@@ -72,55 +67,58 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                 MISSION
             </div>
 
-
             <div class="control-group">
 
-                <label for="launchSite">
+                <label for="launch-site-select">
                     EARTH LAUNCH SITE
                 </label>
 
-                <select id="launchSite"></select>
+                <select id="launch-site-select">
+                    <option value="">
+                        Select launch site
+                    </option>
+                </select>
 
             </div>
 
-
             <div class="control-group">
 
-                <label for="landingSite">
+                <label for="crater-select">
                     LUNAR LANDING SITE
                 </label>
 
-                <select id="landingSite"></select>
+                <select id="crater-select">
+                    <option value="">
+                        Select landing site
+                    </option>
+                </select>
 
             </div>
 
-
             <div class="control-group">
 
-                <label for="missionDate">
+                <label for="mission-date">
                     MISSION DATE
                 </label>
 
                 <input
                     type="date"
-                    id="missionDate"
+                    id="mission-date"
                 >
 
             </div>
 
-
             <div class="control-group">
 
-                <label for="lunarHour">
+                <label for="lunar-hour">
                     LUNAR LOCAL TIME
                 </label>
-
 
                 <div class="slider-row">
 
                     <input
                         type="range"
-                        id="lunarHour"
+                        id="lunar-hour"
                         min="0"
                         max="24"
                         step="1"
@@ -135,62 +133,41 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
 
             </div>
 
-
             <button
                 type="button"
-                id="analyzeButton"
+                id="analyze-button"
                 class="primary-button"
             >
                 ANALYZE SITE
             </button>
 
-
             <button
                 type="button"
-                id="resetButton"
+                id="reset-camera"
                 class="secondary-button"
             >
                 RESET CAMERA
             </button>
 
-
             <div class="panel-divider"></div>
 
 
             <!-- VISUALIZATION -->
-            <!-- =================================
-                 VISUALIZATION
-            ================================== -->
 
             <div class="panel-heading">
                 VISUALIZATION
             </div>
 
-
             <label class="checkbox-row">
 
                 <input
                     type="checkbox"
-                    id="southPoleOnly"
+                    id="crater-filter"
                     checked
                 >
 
                 <span>
-                    South-pole sites
-                </span>
-
-            </label>
-
-
-            <label class="checkbox-row">
-
-                <input
-                    type="checkbox"
-                    id="majorOnly"
-                >
-
-                <span>
-                    Major craters
+                    Show crater sites
                 </span>
 
             </label>
@@ -200,50 +177,42 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
 
                 <button
                     type="button"
-                    id="zoomIn"
+                    id="zoom-in"
                 >
                     +
                 </button>
 
-
                 <button
                     type="button"
-                    id="zoomOut"
+                    id="zoom-out"
                 >
                     −
                 </button>
 
-
                 <button
                     type="button"
-                    id="viewTop"
+                    id="polar-view"
                 >
                     POLAR
                 </button>
 
-
                 <button
                     type="button"
-                    id="viewGlobe"
+                    id="globe-view"
                 >
                     GLOBE
                 </button>
 
             </div>
 
-
             <div class="panel-divider"></div>
 
 
             <!-- CAMERA HELP -->
-            <!-- =================================
-                 CAMERA HELP
-            ================================== -->
 
             <div class="panel-heading">
                 CAMERA
             </div>
-
 
             <div class="camera-help">
 
@@ -252,22 +221,24 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                     <span>Rotate camera</span>
                 </div>
 
-
                 <div>
                     <strong>SCROLL</strong>
                     <span>Zoom</span>
                 </div>
-
 
                 <div>
                     <strong>CLICK</strong>
                     <span>Select site</span>
                 </div>
 
+                <div>
+                    <strong>R</strong>
+                    <span>Reset camera</span>
+                </div>
+
             </div>
 
         </aside>
-
 
 
         <!-- =====================================
@@ -276,11 +247,7 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
 
         <section id="viewport">
 
-
-            <!-- THREE.JS GOES HERE -->
-
             <div id="three-container"></div>
-
 
 
             <!-- VIEW HEADER -->
@@ -302,29 +269,19 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
             </div>
 
 
-
             <!-- CENTER RETICLE -->
 
             <div id="target-reticle">
 
-                <div
-                    class="reticle-corner top-left"
-                ></div>
+                <div class="reticle-corner top-left"></div>
 
-                <div
-                    class="reticle-corner top-right"
-                ></div>
+                <div class="reticle-corner top-right"></div>
 
-                <div
-                    class="reticle-corner bottom-left"
-                ></div>
+                <div class="reticle-corner bottom-left"></div>
 
-                <div
-                    class="reticle-corner bottom-right"
-                ></div>
+                <div class="reticle-corner bottom-right"></div>
 
             </div>
-
 
 
             <!-- SPACE OBJECT LABELS -->
@@ -335,10 +292,8 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                     id="sun-label"
                     class="space-label"
                 >
-                    ☀ SUN
                     SUN
                 </div>
-
 
                 <div
                     id="earth-label"
@@ -350,13 +305,11 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
             </div>
 
 
-
             <!-- CAMERA READOUT -->
 
             <div id="camera-readout">
 
                 <div>
-                    CAMERA
                     CAMERA RANGE
                 </div>
 
@@ -365,7 +318,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                 </strong>
 
             </div>
-
 
 
             <!-- COORDINATE READOUT -->
@@ -379,7 +331,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
             </div>
 
 
-
             <!-- LOADING SCREEN -->
 
             <div id="loading-overlay">
@@ -390,15 +341,11 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                         INITIALIZING MISSION VIEW
                     </div>
 
-
                     <div class="loading-bar">
 
-                        <div
-                            id="loadingProgress"
-                        ></div>
+                        <div id="loadingProgress"></div>
 
                     </div>
-
 
                     <div id="loadingText">
                         Loading lunar environment...
@@ -411,7 +358,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
         </section>
 
 
-
         <!-- =====================================
              RIGHT TELEMETRY PANEL
         ====================================== -->
@@ -421,11 +367,9 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
             class="hud-panel"
         >
 
-
             <div class="panel-heading">
                 MISSION TELEMETRY
             </div>
-
 
 
             <!-- SUN -->
@@ -435,7 +379,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                 <div class="telemetry-label">
                     SUN ELEVATION
                 </div>
-
 
                 <div
                     class="telemetry-value"
@@ -447,7 +390,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
             </div>
 
 
-
             <!-- SOLAR POWER -->
 
             <div class="telemetry-block">
@@ -456,7 +398,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                     SOLAR POWER POTENTIAL
                 </div>
 
-
                 <div
                     class="telemetry-value"
                     id="powerPotential"
@@ -464,17 +405,13 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                     --%
                 </div>
 
-
                 <div class="telemetry-bar">
 
-                    <div
-                        id="powerBar"
-                    ></div>
+                    <div id="powerBar"></div>
 
                 </div>
 
             </div>
-
 
 
             <!-- EARTH VISIBILITY -->
@@ -485,7 +422,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                     EARTH VISIBILITY
                 </div>
 
-
                 <div
                     class="telemetry-value"
                     id="earthVisibility"
@@ -493,17 +429,13 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                     --%
                 </div>
 
-
                 <div class="telemetry-bar">
 
-                    <div
-                        id="earthBar"
-                    ></div>
+                    <div id="earthBar"></div>
 
                 </div>
 
             </div>
-
 
 
             <!-- COMMUNICATION -->
@@ -513,7 +445,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                 <div class="telemetry-label">
                     DIRECT-TO-EARTH
                 </div>
-
 
                 <div
                     class="communication-value"
@@ -525,23 +456,16 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
             </div>
 
 
-
             <div class="panel-divider"></div>
 
 
-
             <!-- SELECTED SITE -->
-            <!-- =================================
-                 SELECTED SITE
-            ================================== -->
 
             <div class="panel-heading">
                 SELECTED SITE
             </div>
 
-
             <div class="site-data">
-
 
                 <div class="data-row">
 
@@ -549,12 +473,11 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                         NAME
                     </span>
 
-                    <strong id="siteName">
+                    <strong id="selected-site-name">
                         --
                     </strong>
 
                 </div>
-
 
                 <div class="data-row">
 
@@ -562,12 +485,11 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                         LATITUDE
                     </span>
 
-                    <strong id="siteLatitude">
+                    <strong id="selected-site-lat">
                         --
                     </strong>
 
                 </div>
-
 
                 <div class="data-row">
 
@@ -575,56 +497,23 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                         LONGITUDE
                     </span>
 
-                    <strong id="siteLongitude">
+                    <strong id="selected-site-lon">
                         --
                     </strong>
 
                 </div>
-
-
-                <div class="data-row">
-
-                    <span>
-                        DIAMETER
-                    </span>
-
-                    <strong id="siteDiameter">
-                        --
-                    </strong>
-
-                </div>
-
-
-                <div class="data-row">
-
-                    <span>
-                        REGION
-                    </span>
-
-                    <strong id="siteRegion">
-                        --
-                    </strong>
-
-                </div>
-
 
             </div>
-
 
 
             <div class="panel-divider"></div>
 
 
-
-            <!-- ASSESSMENT -->
-            <!-- =================================
-                 ASSESSMENT
-            ================================== -->
+            <!-- ANALYSIS -->
 
             <div class="panel-heading">
                 MISSION ASSESSMENT
             </div>
-
 
             <div
                 id="assessment"
@@ -633,12 +522,16 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
                 Select a landing site.
             </div>
 
+            <div
+                id="analysis-warning"
+                class="assessment"
+                style="margin-top: 8px;"
+            >
+            </div>
 
         </aside>
 
-
     </main>
-
 
 
     <!-- =========================================
@@ -646,7 +539,6 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
     ========================================== -->
 
     <section id="comparison-panel">
-
 
         <div class="comparison-title">
 
@@ -664,40 +556,28 @@ Add a comment on line L21Add diff commentMarkdown input:  edit mode selected.Wri
 
         </div>
 
-
         <div
             id="comparisonGrid"
             class="comparison-grid"
         ></div>
 
-
     </section>
-
 
 </div>
 
 
-
 <!-- =========================================
      THREE.JS
-     
-     IMPORTANT:
-     Use the non-module build because app.js
-     accesses THREE through window.THREE.
-========================================== -->
+     ========================================== -->
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 
 <!-- =========================================
      APPLICATION
-========================================== -->
+     ========================================== -->
 
-<script
-    src="{{ url_for('static', filename='app.js') }}"
-></script>
-
+<script src="{{ url_for('static', filename='app.js') }}"></script>
 
 </body>
 
