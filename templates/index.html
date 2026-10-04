@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunar South Pole Planner</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div>
+        <div class="brand">Lunar South Pole Planner</div>
+        <div class="subtitle">Mission planning and landing-site analysis</div>
+    </div>
+
+    <div class="subtitle">CLPS Mission Analysis</div>
+</header>
+
+<div class="dashboard">
+
+    <!-- LEFT PANEL -->
+    <aside class="panel">
+
+        <div class="section-title">Mission Setup</div>
+
+        <div class="field">
+            <label for="launchSite">Earth Launch Site</label>
+            <select id="launchSite"></select>
+        </div>
+
+        <div class="field">
+            <label for="landingSite">Lunar Landing Site</label>
+            <select id="landingSite"></select>
+        </div>
+
+        <div class="field">
+            <label for="missionDate">Mission Date</label>
+            <input type="date" id="missionDate">
+        </div>
+
+        <div class="field">
+            <label for="lunarHour">
+                Lunar Local Time:
+                <span id="lunarHourValue">12:00</span>
+            </label>
+
+            <input
+                type="range"
+                id="lunarHour"
+                min="0"
+                max="24"
+                step="1"
+                value="12"
+            >
+        </div>
+
+        <button id="analyzeButton">
+            Analyze Mission
+        </button>
+
+        <br><br>
+
+        <div class="section-title">Map Filters</div>
+
+        <label class="filter">
+            <input
+                type="checkbox"
+                id="southPoleOnly"
+                checked
+            >
+            South-pole sites only
+        </label>
+
+        <label class="filter">
+            <input
+                type="checkbox"
+                id="majorOnly"
+            >
+            Major craters only
+        </label>
+
+    </aside>
+
+
+    <!-- CENTER PANEL -->
+    <main class="center">
+
+        <div class="moon-view">
+
+            <div class="moon" id="moon">
+
+                <div class="pole-label">
+                    Lunar South Pole
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- RIGHT PANEL -->
+    <aside class="panel right-panel">
+
+        <div class="section-title">
+            Mission Conditions
+        </div>
+
+        <!-- SUN -->
+        <div class="metric">
+
+            <div class="metric-header">
+                <span>Sun Elevation</span>
+            </div>
+
+            <div
+                class="metric-value"
+                id="sunElevation"
+            >
+                --°
+            </div>
+
+        </div>
+
+
+        <!-- POWER -->
+        <div class="metric">
+
+            <div class="metric-header">
+                <span>Solar Power Potential</span>
+            </div>
+
+            <div
+                class="metric-value"
+                id="powerPotential"
+            >
+                --%
+            </div>
+
+            <div class="bar">
+                <div
+                    class="bar-fill"
+                    id="powerBar"
+                ></div>
+            </div>
+
+        </div>
+
+
+        <!-- EARTH -->
+        <div class="metric">
+
+            <div class="metric-header">
+                <span>Earth Visibility</span>
+            </div>
+
+            <div
+                class="metric-value"
+                id="earthVisibility"
+            >
+                --%
+            </div>
+
+            <div class="bar">
+                <div
+                    class="bar-fill"
+                    id="earthBar"
+                ></div>
+            </div>
+
+        </div>
+
+
+        <!-- COMMUNICATION -->
+        <div class="metric">
+
+            <div class="metric-header">
+                <span>Direct-to-Earth Communication</span>
+            </div>
+
+            <div
+                class="status"
+                id="communicationStatus"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <!-- SITE DETAILS -->
+        <div class="site-details">
+
+            <div class="section-title">
+                Site Details
+            </div>
+
+            <div class="detail">
+                <span>Site</span>
+                <span id="siteName">--</span>
+            </div>
+
+            <div class="detail">
+                <span>Coordinates</span>
+                <span id="siteCoordinates">--</span>
+            </div>
+
+            <div class="detail">
+                <span>Diameter</span>
+                <span id="siteDiameter">--</span>
+            </div>
+
+            <div class="detail">
+                <span>Region</span>
+                <span id="siteRegion">--</span>
+            </div>
+
+        </div>
+
+
+        <div class="warning">
+            Approximate planning visualization.
+            Not suitable for real mission operations.
+        </div>
+
+    </aside>
+
+
+    <!-- COMPARISON -->
+    <section class="comparison">
+
+        <div class="section-title">
+            Candidate Landing Site Comparison
+        </div>
+
+        <div
+            class="comparison-grid"
+            id="comparisonGrid"
+        >
+        </div>
+
+    </section>
+
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+</html>
