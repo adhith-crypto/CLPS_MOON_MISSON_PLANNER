@@ -2,11 +2,18 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
+    width: 100%;
+    min-height: 100%;
+    background: #03060c;
+    color: #e8edf5;
     font-family: Arial, Helvetica, sans-serif;
-    background: #05070d;
-    color: #e9eef7;
+}
+
+body {
+    overflow-x: hidden;
 }
 
 button,
@@ -15,313 +22,648 @@ input {
     font: inherit;
 }
 
+/* =========================
+   TOP BAR
+========================= */
+
 .topbar {
-    height: 64px;
+    height: 68px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
-    background: #0b0f18;
-    border-bottom: 1px solid #202938;
+    background: #080d16;
+    border-bottom: 1px solid #202a38;
 }
 
-.brand {
-    font-size: 20px;
-    font-weight: 700;
+.topbar h1 {
+    margin: 0;
+    font-size: 19px;
+    letter-spacing: 2px;
+}
+
+.topbar span {
+    display: block;
+    margin-top: 5px;
+    color: #7f8da1;
+    font-size: 11px;
     letter-spacing: 0.5px;
 }
 
-.subtitle {
-    color: #8f9bad;
-    font-size: 12px;
-}
-
-.dashboard {
-    display: grid;
-    grid-template-columns: 270px 1fr 320px;
-    min-height: calc(100vh - 64px);
-}
-
-.panel {
-    background: #0b0f18;
-    border-right: 1px solid #202938;
-    padding: 18px;
-}
-
-.right-panel {
-    border-right: none;
-    border-left: 1px solid #202938;
-}
-
-.section-title {
-    font-size: 12px;
-    text-transform: uppercase;
+.system-status {
+    color: #aeb9c8;
+    font-size: 11px;
     letter-spacing: 1px;
-    color: #8f9bad;
-    margin-bottom: 10px;
 }
 
-.field {
-    margin-bottom: 16px;
+.status-dot {
+    display: inline-block !important;
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: #8fa6bd;
 }
 
-.field label {
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.app {
+    display: grid;
+    grid-template-columns: 255px minmax(500px, 1fr) 290px;
+    height: 700px;
+}
+
+/* =========================
+   SIDE PANELS
+========================= */
+
+.sidebar,
+.info-panel {
+    padding: 20px;
+    background: #080d16;
+}
+
+.sidebar {
+    border-right: 1px solid #202a38;
+}
+
+.info-panel {
+    border-left: 1px solid #202a38;
+}
+
+.panel-title {
+    margin-bottom: 15px;
+    color: #7e8b9f;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1.7px;
+}
+
+.sidebar label:not(.check) {
     display: block;
-    font-size: 12px;
-    color: #aeb8c8;
+    margin-top: 17px;
     margin-bottom: 7px;
+    color: #8996a8;
+    font-size: 10px;
+    letter-spacing: 1px;
 }
 
 select,
 input[type="date"] {
     width: 100%;
-    padding: 10px;
-    background: #111722;
-    color: #e9eef7;
-    border: 1px solid #2a3445;
-    border-radius: 6px;
+    height: 38px;
+    padding: 0 10px;
+    border: 1px solid #293546;
+    border-radius: 5px;
+    outline: none;
+    background: #0e1520;
+    color: #e8edf5;
 }
 
-input[type="range"] {
-    width: 100%;
+select:focus,
+input[type="date"]:focus {
+    border-color: #65778e;
 }
 
-button {
-    width: 100%;
-    padding: 11px;
-    border: none;
-    border-radius: 6px;
-    background: #dbe7f7;
-    color: #07101d;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-button:hover {
-    opacity: 0.9;
-}
-
-.filter {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin: 9px 0;
-    font-size: 12px;
-    color: #b8c2d1;
-}
-
-.center {
-    position: relative;
-    overflow: hidden;
-    background:
-        radial-gradient(circle at center, #101827 0%, #070a11 55%, #03050a 100%);
-    min-height: 700px;
-}
-
-.moon-view {
-    position: absolute;
-    inset: 0;
+.time-row {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
 }
 
-.moon {
-    width: min(65vw, 570px);
-    height: min(65vw, 570px);
-    max-width: 570px;
-    max-height: 570px;
-    border-radius: 50%;
-    position: relative;
-    background:
-        radial-gradient(circle at 35% 30%, #d6d6d6 0%, #a9a9a9 30%, #707070 65%, #3b3b3b 100%);
-    box-shadow:
-        0 0 80px rgba(180, 190, 210, 0.12),
-        inset -35px -25px 70px rgba(0, 0, 0, 0.55);
+.time-row input {
+    flex: 1;
 }
 
-.moon::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at 25% 45%, rgba(30,30,30,.25) 0 4%, transparent 5%),
-        radial-gradient(circle at 60% 25%, rgba(20,20,20,.22) 0 3%, transparent 4%),
-        radial-gradient(circle at 70% 65%, rgba(20,20,20,.25) 0 5%, transparent 6%),
-        radial-gradient(circle at 35% 75%, rgba(20,20,20,.18) 0 6%, transparent 7%);
-    pointer-events: none;
-}
-
-.crater-marker {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    z-index: 4;
-}
-
-.crater-marker.selected {
-    width: 16px;
-    height: 16px;
-    border-width: 3px;
-}
-
-.crater-label {
-    position: absolute;
-    transform: translate(8px, -50%);
-    white-space: nowrap;
-    font-size: 10px;
-    color: #f0f3f8;
-    pointer-events: none;
-}
-
-.pole-label {
-    position: absolute;
-    top: 5%;
-    left: 50%;
-    transform: translateX(-50%);
+#lunarHourValue {
+    width: 42px;
+    color: #dce3ed;
     font-size: 11px;
-    color: #c8d0dd;
-    z-index: 5;
-}
-
-.metric {
-    margin-bottom: 18px;
-}
-
-.metric-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 7px;
-    font-size: 12px;
-    color: #aeb8c8;
-}
-
-.metric-value {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.bar {
-    width: 100%;
-    height: 7px;
-    border-radius: 10px;
-    background: #202938;
-    overflow: hidden;
-}
-
-.bar-fill {
-    height: 100%;
-    width: 0%;
-    background: #dbe7f7;
-    transition: width .3s ease;
-}
-
-.status {
-    padding: 9px;
-    border: 1px solid #2a3445;
-    border-radius: 6px;
-    margin-top: 8px;
-    font-size: 12px;
-}
-
-.site-details {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid #202938;
-}
-
-.detail {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    margin: 8px 0;
-    font-size: 12px;
-}
-
-.detail span:first-child {
-    color: #8490a3;
-}
-
-.detail span:last-child {
     text-align: right;
 }
 
-.warning {
-    margin-top: 18px;
-    padding: 10px;
-    border: 1px solid #493d20;
-    background: #17140b;
-    color: #cfc3a3;
-    border-radius: 6px;
-    font-size: 11px;
-    line-height: 1.5;
+input[type="range"] {
+    accent-color: #b7c6d8;
 }
 
+.primary-button,
+.secondary-button,
+.small-button {
+    width: 100%;
+    height: 37px;
+    margin-top: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.primary-button {
+    border: 1px solid #d0dae6;
+    background: #d9e2ec;
+    color: #08101b;
+    font-weight: bold;
+}
+
+.secondary-button,
+.small-button {
+    border: 1px solid #2b394a;
+    background: #101822;
+    color: #b7c3d2;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.small-button:hover {
+    filter: brightness(1.15);
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+    color: #9da9ba;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.check input {
+    accent-color: #bdc9d8;
+}
+
+.divider {
+    height: 1px;
+    margin: 22px 0;
+    background: #202a38;
+}
+
+/* =========================
+   VISUALIZATION
+========================= */
+
+.visualization {
+    position: relative;
+    min-width: 0;
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #172131 0%,
+            #0b111b 35%,
+            #050910 72%,
+            #020409 100%
+        );
+}
+
+.view-header {
+    position: absolute;
+    z-index: 20;
+    top: 18px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.view-header strong {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1.3px;
+}
+
+.view-header span {
+    display: block;
+    margin-top: 5px;
+    color: #738196;
+    font-size: 9px;
+}
+
+.view-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.view-controls button {
+    width: auto;
+    padding: 7px 10px;
+    border: 1px solid #2c394b;
+    border-radius: 4px;
+    background: #0b121d;
+    color: #9caabc;
+    font-size: 9px;
+    cursor: pointer;
+}
+
+.view-controls button:hover {
+    background: #172231;
+}
+
+/* =========================
+   SPACE / MOON
+========================= */
+
+#space {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: grab;
+    perspective: 1100px;
+}
+
+#space.dragging {
+    cursor: grabbing;
+}
+
+#moon {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    left: 50%;
+    top: 52%;
+    margin-left: -250px;
+    margin-top: -250px;
+
+    border-radius: 50%;
+
+    transform-style: preserve-3d;
+
+    transition: transform 0.25s ease;
+
+    background:
+        radial-gradient(
+            circle at 34% 27%,
+            #d8d8d8 0%,
+            #bcbcbc 23%,
+            #999 48%,
+            #6e6e6e 72%,
+            #3c3c3c 100%
+        );
+
+    box-shadow:
+        -30px -20px 50px rgba(255,255,255,0.08),
+        25px 30px 60px rgba(0,0,0,0.75),
+        inset -35px -20px 70px rgba(0,0,0,0.65);
+}
+
+.moon-surface {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    overflow: hidden;
+
+    background:
+        radial-gradient(circle at 18% 30%, rgba(40,40,40,.45) 0 4%, transparent 4.5%),
+        radial-gradient(circle at 67% 18%, rgba(40,40,40,.35) 0 5%, transparent 5.5%),
+        radial-gradient(circle at 74% 52%, rgba(30,30,30,.38) 0 7%, transparent 7.5%),
+        radial-gradient(circle at 37% 67%, rgba(30,30,30,.3) 0 5%, transparent 5.5%),
+        radial-gradient(circle at 52% 84%, rgba(30,30,30,.32) 0 8%, transparent 8.5%),
+        radial-gradient(circle at 15% 72%, rgba(255,255,255,.12) 0 4%, transparent 4.5%);
+}
+
+.moon-surface::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        repeating-radial-gradient(
+            circle at 40% 45%,
+            transparent 0 22px,
+            rgba(30,30,30,.08) 23px 25px
+        );
+
+    opacity: .6;
+}
+
+.south-pole-line {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    width: 65%;
+    height: 1px;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,.35);
+}
+
+.pole-text {
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #dce3ed;
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+/* =========================
+   CRATER MARKERS
+========================= */
+
+#craterLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.crater {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: 2px solid #dce5ef;
+    border-radius: 50%;
+    background: rgba(10,15,22,.35);
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.crater:hover {
+    width: 18px;
+    height: 18px;
+    border-color: white;
+    background: rgba(220,230,240,.2);
+}
+
+.crater.selected {
+    width: 20px;
+    height: 20px;
+    border: 3px solid white;
+    box-shadow: 0 0 16px rgba(255,255,255,.5);
+}
+
+.crater-name {
+    position: absolute;
+    left: 17px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: max-content;
+    color: #edf2f7;
+    font-size: 9px;
+    font-weight: bold;
+    text-shadow: 0 1px 4px black;
+    pointer-events: none;
+}
+
+/* =========================
+   EARTH / SUN
+========================= */
+
+#earth-indicator {
+    position: absolute;
+    right: 9%;
+    top: 27%;
+    z-index: 5;
+    text-align: center;
+    color: #8d9aae;
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
+.earth-circle {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 6px;
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #b9c8d6,
+            #52687d 45%,
+            #1a2737 75%,
+            #080d15
+        );
+
+    box-shadow: 0 0 25px rgba(120,150,180,.18);
+}
+
+#sun-indicator {
+    position: absolute;
+    left: 8%;
+    top: 27%;
+    z-index: 5;
+    color: #aebccc;
+    font-size: 25px;
+    text-align: center;
+}
+
+#sun-indicator span {
+    display: block;
+    margin-top: 4px;
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
+/* =========================
+   COORDINATES
+========================= */
+
+.coordinates {
+    position: absolute;
+    bottom: 14px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    color: #627084;
+    font-size: 8px;
+    letter-spacing: .8px;
+    pointer-events: none;
+}
+
+/* =========================
+   RIGHT PANEL
+========================= */
+
+.metric-card {
+    padding: 13px 0;
+    border-bottom: 1px solid #182230;
+}
+
+.metric-card span {
+    display: block;
+    color: #788699;
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+.metric-card strong {
+    display: block;
+    margin-top: 6px;
+    color: #e5ebf2;
+    font-size: 21px;
+}
+
+.progress {
+    width: 100%;
+    height: 4px;
+    margin-top: 9px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #202a37;
+}
+
+.progress div {
+    width: 0%;
+    height: 100%;
+    background: #b8c7d8;
+    transition: width .4s ease;
+}
+
+.communication {
+    font-size: 14px !important;
+}
+
+.site-info > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 11px 0;
+}
+
+.site-info span {
+    color: #667488;
+    font-size: 9px;
+}
+
+.site-info strong {
+    max-width: 155px;
+    color: #d4dce6;
+    font-size: 10px;
+    text-align: right;
+}
+
+.assessment {
+    padding: 12px;
+    border: 1px solid #293647;
+    border-radius: 5px;
+    background: #0d141e;
+    color: #9daabc;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* =========================
+   COMPARISON
+========================= */
+
 .comparison {
-    grid-column: 1 / -1;
-    padding: 18px;
-    background: #080c14;
-    border-top: 1px solid #202938;
+    padding: 20px 24px 30px;
+    background: #050910;
+    border-top: 1px solid #202a38;
+}
+
+.comparison-header h2 {
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+}
+
+.comparison-header span {
+    display: block;
+    margin-top: 5px;
+    color: #68768a;
+    font-size: 9px;
 }
 
 .comparison-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
 }
 
-.site-card {
-    background: #0e141f;
-    border: 1px solid #222d3d;
-    border-radius: 8px;
-    padding: 14px;
+.comparison-card {
+    padding: 13px;
+    border: 1px solid #202c3b;
+    border-radius: 6px;
+    background: #0b121c;
+    cursor: pointer;
+    transition: .2s ease;
 }
 
-.site-card h3 {
-    margin: 0 0 10px;
-    font-size: 14px;
+.comparison-card:hover {
+    transform: translateY(-2px);
+    border-color: #607086;
+    background: #101925;
 }
 
-.site-card p {
-    margin: 6px 0;
-    color: #aab4c4;
-    font-size: 11px;
+.comparison-card h3 {
+    margin: 0 0 11px;
+    color: #dce4ed;
+    font-size: 12px;
 }
+
+.comparison-card div {
+    display: flex;
+    justify-content: space-between;
+    margin: 7px 0;
+    color: #718095;
+    font-size: 9px;
+}
+
+.comparison-card strong {
+    color: #c8d2de;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 1100px) {
-    .dashboard {
-        grid-template-columns: 240px 1fr;
+
+    .app {
+        grid-template-columns: 220px 1fr;
+        height: auto;
     }
 
-    .right-panel {
+    .info-panel {
         grid-column: 1 / -1;
+        border-top: 1px solid #202a38;
         border-left: none;
-        border-top: 1px solid #202938;
+    }
+
+    .visualization {
+        min-height: 650px;
     }
 }
 
 @media (max-width: 750px) {
-    .dashboard {
-        grid-template-columns: 1fr;
+
+    .topbar {
+        height: auto;
+        padding: 15px;
     }
 
-    .panel,
-    .right-panel {
+    .system-status {
+        display: none;
+    }
+
+    .app {
+        display: block;
+    }
+
+    .sidebar,
+    .info-panel {
         border: none;
-        border-bottom: 1px solid #202938;
+        border-bottom: 1px solid #202a38;
     }
 
-    .center {
-        min-height: 600px;
+    .visualization {
+        height: 600px;
     }
 
-    .moon {
-        width: 80vw;
-        height: 80vw;
+    #moon {
+        width: 380px;
+        height: 380px;
+        margin-left: -190px;
+        margin-top: -190px;
+    }
+
+    .comparison {
+        padding: 15px;
     }
 }
