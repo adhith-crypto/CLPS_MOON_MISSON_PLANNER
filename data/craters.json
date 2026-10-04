@@ -1,1 +1,226 @@
-data/craters.json
+[
+  {
+    "name": "Shackleton",
+    "lat": -89.90,
+    "lon": 0.00,
+    "diameter_km": 21,
+    "region": "South Pole"
+  },
+  {
+    "name": "Haworth",
+    "lat": -87.40,
+    "lon": 5.00,
+    "diameter_km": 51,
+    "region": "South Pole"
+  },
+  {
+    "name": "Shoemaker",
+    "lat": -88.10,
+    "lon": 45.90,
+    "diameter_km": 51,
+    "region": "South Pole"
+  },
+  {
+    "name": "Faustini",
+    "lat": -87.30,
+    "lon": 77.50,
+    "diameter_km": 39,
+    "region": "South Pole"
+  },
+  {
+    "name": "Cabeus",
+    "lat": -84.90,
+    "lon": -35.70,
+    "diameter_km": 98,
+    "region": "South Pole"
+  },
+  {
+    "name": "de Gerlache",
+    "lat": -88.60,
+    "lon": -87.00,
+    "diameter_km": 32,
+    "region": "South Pole"
+  },
+  {
+    "name": "Amundsen",
+    "lat": -84.50,
+    "lon": 82.80,
+    "diameter_km": 105,
+    "region": "South Pole"
+  },
+  {
+    "name": "Nobile",
+    "lat": -85.20,
+    "lon": 53.00,
+    "diameter_km": 73,
+    "region": "South Pole"
+  },
+  {
+    "name": "Malapert",
+    "lat": -85.80,
+    "lon": 0.00,
+    "diameter_km": 69,
+    "region": "South Pole"
+  },
+  {
+    "name": "Idel'son",
+    "lat": -81.90,
+    "lon": 113.00,
+    "diameter_km": 88,
+    "region": "South Pole"
+  },
+  {
+    "name": "Leibnitz",
+    "lat": -84.80,
+    "lon": 179.00,
+    "diameter_km": 245,
+    "region": "South Pole"
+  },
+  {
+    "name": "Drygalski",
+    "lat": -75.40,
+    "lon": -117.00,
+    "diameter_km": 149,
+    "region": "South Pole"
+  },
+  {
+    "name": "Scott",
+    "lat": -82.40,
+    "lon": -48.60,
+    "diameter_km": 109,
+    "region": "South Pole"
+  },
+  {
+    "name": "Tycho",
+    "lat": -43.31,
+    "lon": -11.36,
+    "diameter_km": 85,
+    "region": "Major"
+  },
+  {
+    "name": "Clavius",
+    "lat": -58.40,
+    "lon": -14.70,
+    "diameter_km": 231,
+    "region": "Major"
+  },
+  {
+    "name": "Copernicus",
+    "lat": 9.62,
+    "lon": -20.08,
+    "diameter_km": 93,
+    "region": "Major"
+  },
+  {
+    "name": "Plato",
+    "lat": 51.60,
+    "lon": -9.40,
+    "diameter_km": 101,
+    "region": "Major"
+  },
+  {
+    "name": "Aristarchus",
+    "lat": 23.70,
+    "lon": -47.40,
+    "diameter_km": 40,
+    "region": "Major"
+  },
+  {
+    "name": "Kepler",
+    "lat": 8.10,
+    "lon": -38.00,
+    "diameter_km": 32,
+    "region": "Major"
+  },
+  {
+    "name": "Grimaldi",
+    "lat": -5.20,
+    "lon": -68.30,
+    "diameter_km": 173,
+    "region": "Major"
+  },
+  {
+    "name": "Schickard",
+    "lat": -44.30,
+    "lon": -55.10,
+    "diameter_km": 206,
+    "region": "Major"
+  },
+  {
+    "name": "Langrenus",
+    "lat": -8.90,
+    "lon": 60.90,
+    "diameter_km": 132,
+    "region": "Major"
+  },
+  {
+    "name": "Petavius",
+    "lat": -25.30,
+    "lon": 60.80,
+    "diameter_km": 177,
+    "region": "Major"
+  },
+  {
+    "name": "Theophilus",
+    "lat": -11.40,
+    "lon": 26.40,
+    "diameter_km": 102,
+    "region": "Major"
+  },
+  {
+    "name": "Maurolycus",
+    "lat": -41.80,
+    "lon": 14.00,
+    "diameter_km": 114,
+    "region": "Major"
+  },
+  {
+    "name": "Humboldt",
+    "lat": -27.00,
+    "lon": 80.90,
+    "diameter_km": 199,
+    "region": "Major"
+  },
+  {
+    "name": "Arago",
+    "lat": 6.15,
+    "lon": 21.40,
+    "diameter_km": 26,
+    "region": "Major"
+  },
+  {
+    "name": "Eratosthenes",
+    "lat": 14.50,
+    "lon": -11.30,
+    "diameter_km": 59,
+    "region": "Major"
+  },
+  {
+    "name": "Gassendi",
+    "lat": -17.60,
+    "lon": -39.90,
+    "diameter_km": 110,
+    "region": "Major"
+  },
+  {
+    "name": "Posidonius",
+    "lat": 31.90,
+    "lon": 29.90,
+    "diameter_km": 95,
+    "region": "Major"
+  },
+  {
+    "name": "Endymion",
+    "lat": 53.60,
+    "lon": -56.50,
+    "diameter_km": 125,
+    "region": "Major"
+  },
+  {
+    "name": "Herschel",
+    "lat": -5.70,
+    "lon": 2.10,
+    "diameter_km": 41,
+    "region": "Major"
+  }
+]
